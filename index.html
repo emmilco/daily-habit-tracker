@@ -1,0 +1,60 @@
+// CAVEAT EMPTOR: The following code was generated using ClaudeAI. 
+
+// Google Apps Script code for handling form submissions
+// Deploy as web app with "Execute as: Me" and "Who has access: Anyone"
+
+function doPost(e) {
+  try {
+    // Get the active spreadsheet (or specify by ID)
+    const sheet = SpreadsheetApp.getActiveSheet();
+    
+    // Parse the form data
+    const data = JSON.parse(e.postData.contents);
+    
+    // Create timestamp
+    const timestamp = new Date();
+    
+    // Prepare row data - adjust based on your specific questions
+    const rowData = [
+      timestamp,
+      data.question1, // Yes/No questions
+      data.question2,
+      data.question3,
+      data.question4,
+      data.question5,
+      data.question6,
+      data.scale1,    // 1-5 scale questions
+      data.scale2
+    ];
+    
+    // Append to sheet
+    sheet.appendRow(rowData);
+    
+    // Return success response
+    return ContentService
+      .createTextOutput(JSON.stringify({status: 'success', timestamp: timestamp}))
+      .setMimeType(ContentService.MimeType.JSON)
+      .setHeaders({
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      });
+      
+  } catch (error) {
+    Logger.log('Error: ' + error.toString());
+    return ContentService
+      .createTextOutput(JSON.stringify({status: 'error', message: error.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// Handle preflight requests for CORS
+function doOptions() {
+  return ContentService
+    .createTextOutput('')
+    .setHeaders({
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    });
+}
