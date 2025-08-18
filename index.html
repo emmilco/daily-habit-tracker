@@ -1,5 +1,5 @@
 <!-- CAVEAT EMPTOR: The following code was generated using ClaudeAI.  -->
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -380,7 +380,7 @@
                 type: "yesno"
             },
             {
-                text: "Was your sleep disrupted last night or did you go to bed past 1am?",
+                text: "Did you go to bed on time?<br>Was your sleep disrupted?",
                 field: "question2",
                 type: "yesno"
             },
@@ -414,7 +414,7 @@
                 text: "How dry were your hands today?",
                 field: "scale2",
                 type: "scale",
-                labels: ["Very sweaty", "Bone dry"]
+                labels: ["Bone dry", "Very sweaty"]
             }
         ];
         
@@ -458,11 +458,18 @@
                 </div>
             `;
             
-            // Trigger animation
+            // Trigger animation and ensure no buttons are pre-selected
             setTimeout(() => {
                 const questionEl = questionContainer.querySelector('.question');
                 questionEl.classList.remove('entering');
                 questionEl.classList.add('active');
+                
+                // Force clear any accidentally highlighted buttons
+                const allButtons = questionContainer.querySelectorAll('.btn, .scale-btn');
+                allButtons.forEach(btn => {
+                    btn.classList.remove('selected');
+                    btn.blur(); // Remove focus state
+                });
             }, 10);
         }
         
