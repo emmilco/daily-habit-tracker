@@ -1,5 +1,5 @@
 <!-- CAVEAT EMPTOR: The following code was generated using ClaudeAI.  -->
-<!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -130,6 +130,15 @@
             text-align: center;
             touch-action: manipulation;
             user-select: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            outline: none;
+        }
+        
+        .btn:focus {
+            outline: none;
+            border-color: #667eea;
         }
         
         .btn:active {
@@ -170,6 +179,15 @@
             justify-content: center;
             touch-action: manipulation;
             user-select: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            outline: none;
+        }
+        
+        .scale-btn:focus {
+            outline: none;
+            border-color: #667eea;
         }
         
         .scale-btn:active {
@@ -380,7 +398,7 @@
                 type: "yesno"
             },
             {
-                text: "Did you go to bed on time?<br>Was your sleep disrupted?",
+                text: "Did you go to bed on time?<br>Sleep without major disruptions?",
                 field: "question2",
                 type: "yesno"
             },
@@ -451,6 +469,12 @@
                 `;
             }
             
+            // Clear container completely before adding new content
+            questionContainer.innerHTML = '';
+            
+            // Force a reflow to ensure clean state
+            questionContainer.offsetHeight;
+            
             questionContainer.innerHTML = `
                 <div class="question entering">
                     <div class="question-text">${question.text}</div>
@@ -458,19 +482,27 @@
                 </div>
             `;
             
-            // Trigger animation and ensure no buttons are pre-selected
+            // Trigger animation and ensure completely clean button state
             setTimeout(() => {
                 const questionEl = questionContainer.querySelector('.question');
-                questionEl.classList.remove('entering');
-                questionEl.classList.add('active');
-                
-                // Force clear any accidentally highlighted buttons
-                const allButtons = questionContainer.querySelectorAll('.btn, .scale-btn');
-                allButtons.forEach(btn => {
-                    btn.classList.remove('selected');
-                    btn.blur(); // Remove focus state
-                });
-            }, 10);
+                if (questionEl) {
+                    questionEl.classList.remove('entering');
+                    questionEl.classList.add('active');
+                    
+                    // Triple-check button state cleanup
+                    const allButtons = questionContainer.querySelectorAll('.btn, .scale-btn');
+                    allButtons.forEach(btn => {
+                        btn.classList.remove('selected');
+                        btn.blur();
+                        btn.removeAttribute('style');
+                        // Force reset any CSS properties that might be stuck
+                        btn.style.background = '';
+                        btn.style.color = '';
+                        btn.style.borderColor = '';
+                        btn.style.transform = '';
+                    });
+                }
+            }, 50); // Increased delay slightly
         }
         
         function renderCompletionScreen() {
@@ -520,6 +552,16 @@
                 if (currentQuestionEl) {
                     currentQuestionEl.classList.remove('active');
                     currentQuestionEl.classList.add('exiting');
+                    
+                    // Aggressively clear all button states before transition
+                    const allButtons = currentQuestionEl.querySelectorAll('.btn, .scale-btn');
+                    allButtons.forEach(btn => {
+                        btn.classList.remove('selected');
+                        btn.blur();
+                        btn.style.removeProperty('background');
+                        btn.style.removeProperty('color');
+                        btn.style.removeProperty('border-color');
+                    });
                 }
                 
                 setTimeout(() => {
