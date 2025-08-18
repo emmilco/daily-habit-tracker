@@ -1,5 +1,4 @@
-<!-- CAVEAT EMPTOR: The following code was generated using ClaudeAI.  -->
-<!DOCTYPE html>
+<!-- CAVEAT EMPTOR: The following code was generated using ClaudeAI.  --><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -155,6 +154,26 @@
             color: white;
             border-color: #667eea;
             transform: scale(1.05);
+        }
+        
+        /* Disable hover effects on touch devices */
+        @media (hover: none) and (pointer: coarse) {
+            .btn:hover {
+                border-color: #e0e0e0;
+                transform: none;
+            }
+            
+            .scale-btn:hover {
+                border-color: #e0e0e0;
+                transform: none;
+            }
+        }
+        
+        /* Additional iOS hover fix */
+        .touching .btn:hover,
+        .touching .scale-btn:hover {
+            border-color: #e0e0e0 !important;
+            transform: none !important;
         }
         
         .scale-group {
@@ -695,8 +714,28 @@
             if (e.target.classList.contains('btn') || e.target.classList.contains('scale-btn')) {
                 const field = e.target.getAttribute('data-field');
                 const value = e.target.getAttribute('data-value');
+                
+                // Force remove hover state on iOS by temporarily disabling pointer events
+                e.target.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    e.target.style.pointerEvents = '';
+                }, 300);
+                
                 handleAnswer(field, value);
             }
+        });
+        
+        // Additional iOS hover fix - remove hover states on any touch
+        document.addEventListener('touchstart', function() {
+            // Add a class to body to disable hover effects during touch
+            document.body.classList.add('touching');
+        });
+        
+        document.addEventListener('touchend', function() {
+            // Remove the touching class after a delay to prevent phantom hovers
+            setTimeout(() => {
+                document.body.classList.remove('touching');
+            }, 500);
         });
         
         // Initialize - render first question
