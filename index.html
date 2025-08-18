@@ -1,5 +1,4 @@
 <!-- CAVEAT EMPTOR: The following code was generated using ClaudeAI.  -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -540,8 +539,35 @@
             
             // Advance to next question after short delay
             setTimeout(() => {
+                // Clear the selection styling before moving to next question
+                buttons.forEach(btn => btn.classList.remove('selected'));
                 showNextQuestion();
             }, 250);
+        }
+        
+        async function getUserLocation() {
+            return new Promise((resolve) => {
+                if ('geolocation' in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude.toFixed(6);
+                            const lng = position.coords.longitude.toFixed(6);
+                            resolve(`${lat},${lng}`);
+                        },
+                        (error) => {
+                            console.log('Location access denied or failed:', error);
+                            resolve('location_unavailable');
+                        },
+                        {
+                            enableHighAccuracy: false,
+                            timeout: 5000,
+                            maximumAge: 300000 // 5 minutes
+                        }
+                    );
+                } else {
+                    resolve('geolocation_not_supported');
+                }
+            });
         }
         
         async function handleSubmit() {
@@ -556,8 +582,18 @@
             }
             
             try {
-                // Create comma-separated string of responses in order
+                // Get current UTC date and time
+                const now = new Date();
+                const utcDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
+                const utcTime = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS
+                
+                // Get user location
+                const location = await getUserLocation();
+                
+                // Create comma-separated string with date/time first, then responses, then location
                 const responses = [
+                    utcDate,
+                    utcTime,
                     formData.question1,
                     formData.question2,
                     formData.question3,
@@ -565,7 +601,8 @@
                     formData.question5,
                     formData.question6,
                     formData.scale1,
-                    formData.scale2
+                    formData.scale2,
+                    location
                 ];
                 
                 const dataString = responses.join(',');
