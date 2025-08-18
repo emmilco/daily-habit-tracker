@@ -1,60 +1,631 @@
-// CAVEAT EMPTOR: The following code was generated using ClaudeAI. 
+<!-- CAVEAT EMPTOR: The following code was generated using ClaudeAI.  -->
 
-// Google Apps Script code for handling form submissions
-// Deploy as web app with "Execute as: Me" and "Who has access: Anyone"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Daily Check-in</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            padding: 40px 32px;
+            max-width: 400px;
+            width: 100%;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 2px;
+        }
+        
+        .question-counter {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .question-container {
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .question {
+            width: 100%;
+            text-align: center;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.3s ease;
+        }
+        
+        .question.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .question.entering {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        
+        .question.exiting {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 32px;
+            color: #333;
+            font-size: 20px;
+            line-height: 1.4;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+        
+        .btn {
+            min-width: 120px;
+            padding: 16px 24px;
+            border: 3px solid #e0e0e0;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            touch-action: manipulation;
+            user-select: none;
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        .btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+        
+        .scale-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .scale-btn {
+            width: 56px;
+            height: 56px;
+            border: 3px solid #e0e0e0;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 700;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            user-select: none;
+        }
+        
+        .scale-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .scale-btn:hover {
+            border-color: #667eea;
+            transform: scale(1.1);
+        }
+        
+        .scale-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.15);
+        }
+        
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #666;
+            padding: 0 12px;
+        }
+        
+        .completion-screen {
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.4s ease;
+        }
+        
+        .completion-screen.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .completion-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+            animation: bounce 0.6s ease;
+        }
+        
+        .completion-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+        }
+        
+        .completion-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 32px;
+        }
+        
+        .submit-btn {
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+        }
+        
+        .submit-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .success-screen {
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.4s ease;
+        }
+        
+        .success-screen.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .success-icon {
+            font-size: 72px;
+            color: #28a745;
+            margin-bottom: 24px;
+            animation: bounce 0.6s ease;
+        }
+        
+        .success-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 12px;
+        }
+        
+        .success-subtitle {
+            font-size: 16px;
+            color: #666;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            body {
+                padding: 16px;
+            }
+            
+            .container {
+                padding: 32px 24px;
+                min-height: 450px;
+                border-radius: 16px;
+            }
+            
+            .question-text {
+                font-size: 18px;
+                margin-bottom: 28px;
+            }
+            
+            .btn {
+                min-width: 100px;
+                padding: 14px 20px;
+                font-size: 15px;
+            }
+            
+            .scale-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 16px;
+            }
+            
+            .scale-group {
+                gap: 8px;
+            }
+        }
+        
+        /* Landscape mobile */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .container {
+                min-height: auto;
+                padding: 24px;
+            }
+            
+            .question-container {
+                min-height: 160px;
+            }
+            
+            .question-text {
+                margin-bottom: 24px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="question-counter" id="questionCounter">Question 1 of 8</div>
+            <h1>Daily Check-in</h1>
+        </div>
+        
+        <div class="question-container" id="questionContainer">
+            <!-- Current question will be rendered here dynamically -->
+        </div>
+    </div>
 
-function doPost(e) {
-  try {
-    // Get the active spreadsheet (or specify by ID)
-    const sheet = SpreadsheetApp.getActiveSheet();
-    
-    // Parse the form data
-    const data = JSON.parse(e.postData.contents);
-    
-    // Create timestamp
-    const timestamp = new Date();
-    
-    // Prepare row data - adjust based on your specific questions
-    const rowData = [
-      timestamp,
-      data.question1, // Yes/No questions
-      data.question2,
-      data.question3,
-      data.question4,
-      data.question5,
-      data.question6,
-      data.scale1,    // 1-5 scale questions
-      data.scale2
-    ];
-    
-    // Append to sheet
-    sheet.appendRow(rowData);
-    
-    // Return success response
-    return ContentService
-      .createTextOutput(JSON.stringify({status: 'success', timestamp: timestamp}))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setHeaders({
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST',
-        'Access-Control-Allow-Headers': 'Content-Type'
-      });
-      
-  } catch (error) {
-    Logger.log('Error: ' + error.toString());
-    return ContentService
-      .createTextOutput(JSON.stringify({status: 'error', message: error.toString()}))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-// Handle preflight requests for CORS
-function doOptions() {
-  return ContentService
-    .createTextOutput('')
-    .setHeaders({
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
-    });
-}
+    <script>
+        const formData = {};
+        let currentQuestion = 0;
+        const totalQuestions = 8;
+        
+        // Replace with your actual Google Apps Script URL
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMNEMDZH1tZSRR_OnOTuEx0Dd7L7pwMXfx62qGqJF7hd614slaSua4u1n9v0BgQx_7gA/exec';
+        
+        const questionContainer = document.getElementById('questionContainer');
+        const progressFill = document.getElementById('progressFill');
+        const questionCounter = document.getElementById('questionCounter');
+        
+        // Question data
+        const questions = [
+            {
+                text: "Did you get up on time?",
+                field: "question1",
+                type: "yesno"
+            },
+            {
+                text: "Was your sleep disrupted last night or did you go to bed past 1am?",
+                field: "question2",
+                type: "yesno"
+            },
+            {
+                text: "Did you do cardio?",
+                field: "question3",
+                type: "yesno"
+            },
+            {
+                text: "Do any creative writing?",
+                field: "question4",
+                type: "yesno"
+            },
+            {
+                text: "Did you lift?",
+                field: "question5",
+                type: "yesno"
+            },
+            {
+                text: "Iontophoresis?",
+                field: "question6",
+                type: "yesno"
+            },
+            {
+                text: "How severe was your reflux today?",
+                field: "scale1",
+                type: "scale",
+                labels: ["No reflux", "Severe"]
+            },
+            {
+                text: "How dry were your hands today?",
+                field: "scale2",
+                type: "scale",
+                labels: ["Very sweaty", "Bone dry"]
+            }
+        ];
+        
+        function updateProgress() {
+            const progress = (currentQuestion / totalQuestions) * 100;
+            progressFill.style.width = `${progress}%`;
+            questionCounter.textContent = `Question ${currentQuestion + 1} of ${totalQuestions}`;
+        }
+        
+        function renderQuestion(questionIndex) {
+            const question = questions[questionIndex];
+            let buttonsHTML = '';
+            
+            if (question.type === 'yesno') {
+                buttonsHTML = `
+                    <div class="button-group">
+                        <button type="button" class="btn" data-field="${question.field}" data-value="Yes">Yes</button>
+                        <button type="button" class="btn" data-field="${question.field}" data-value="No">No</button>
+                    </div>
+                `;
+            } else if (question.type === 'scale') {
+                buttonsHTML = `
+                    <div class="scale-group">
+                        <button type="button" class="scale-btn" data-field="${question.field}" data-value="1">1</button>
+                        <button type="button" class="scale-btn" data-field="${question.field}" data-value="2">2</button>
+                        <button type="button" class="scale-btn" data-field="${question.field}" data-value="3">3</button>
+                        <button type="button" class="scale-btn" data-field="${question.field}" data-value="4">4</button>
+                        <button type="button" class="scale-btn" data-field="${question.field}" data-value="5">5</button>
+                    </div>
+                    <div class="scale-labels">
+                        <span>${question.labels[0]}</span>
+                        <span>${question.labels[1]}</span>
+                    </div>
+                `;
+            }
+            
+            questionContainer.innerHTML = `
+                <div class="question entering">
+                    <div class="question-text">${question.text}</div>
+                    ${buttonsHTML}
+                </div>
+            `;
+            
+            // Trigger animation
+            setTimeout(() => {
+                const questionEl = questionContainer.querySelector('.question');
+                questionEl.classList.remove('entering');
+                questionEl.classList.add('active');
+            }, 10);
+        }
+        
+        function renderCompletionScreen() {
+            questionContainer.innerHTML = `
+                <div class="completion-screen entering">
+                    <div class="completion-icon">📝</div>
+                    <div class="completion-title">All done!</div>
+                    <div class="completion-subtitle">Submitting your check-in...</div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const screen = questionContainer.querySelector('.completion-screen');
+                screen.classList.remove('entering');
+                screen.classList.add('active');
+                
+                // Auto-submit after showing completion screen
+                setTimeout(() => {
+                    handleSubmit();
+                }, 1000);
+            }, 10);
+            
+            questionCounter.textContent = 'Complete!';
+            progressFill.style.width = '100%';
+        }
+        
+        function renderSuccessScreen() {
+            questionContainer.innerHTML = `
+                <div class="success-screen entering">
+                    <div class="success-icon">✅</div>
+                    <div class="success-title">Check-in Submitted!</div>
+                    <div class="success-subtitle">Your responses have been saved successfully.<br>See you tomorrow!</div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const screen = questionContainer.querySelector('.success-screen');
+                screen.classList.remove('entering');
+                screen.classList.add('active');
+            }, 10);
+        }
+        
+        function showNextQuestion() {
+            if (currentQuestion < questions.length) {
+                // Exit current question
+                const currentQuestionEl = questionContainer.querySelector('.question, .completion-screen');
+                if (currentQuestionEl) {
+                    currentQuestionEl.classList.remove('active');
+                    currentQuestionEl.classList.add('exiting');
+                }
+                
+                setTimeout(() => {
+                    if (currentQuestion < questions.length - 1) {
+                        currentQuestion++;
+                        renderQuestion(currentQuestion);
+                        updateProgress();
+                    } else {
+                        // Last question answered - show completion and auto-submit
+                        renderCompletionScreen();
+                    }
+                }, 300);
+            }
+        }
+        
+        function handleAnswer(field, value) {
+            // Store the answer
+            formData[field] = value;
+            
+            // Visual feedback - highlight the selected button
+            const buttons = questionContainer.querySelectorAll('.btn, .scale-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            // Advance to next question after short delay
+            setTimeout(() => {
+                showNextQuestion();
+            }, 250);
+        }
+        
+        async function handleSubmit() {
+            // Update the completion screen to show submitting status
+            const completionScreen = questionContainer.querySelector('.completion-screen');
+            if (completionScreen) {
+                const subtitle = completionScreen.querySelector('.completion-subtitle');
+                const icon = completionScreen.querySelector('.completion-icon');
+                
+                subtitle.textContent = 'Submitting...';
+                icon.textContent = '⏳';
+            }
+            
+            try {
+                // Create comma-separated string of responses in order
+                const responses = [
+                    formData.question1,
+                    formData.question2,
+                    formData.question3,
+                    formData.question4,
+                    formData.question5,
+                    formData.question6,
+                    formData.scale1,
+                    formData.scale2
+                ];
+                
+                const dataString = responses.join(',');
+                
+                // Create form data for POST request
+                const formDataToSend = new FormData();
+                formDataToSend.append('data', dataString);
+                
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formDataToSend
+                });
+                
+                const result = await response.text();
+                
+                // Assume success if we get any response without error
+                // Transition to success screen
+                if (completionScreen) {
+                    completionScreen.classList.remove('active');
+                    completionScreen.classList.add('exiting');
+                }
+                
+                setTimeout(() => {
+                    renderSuccessScreen();
+                }, 300);
+                
+            } catch (error) {
+                // Show error state in completion screen
+                if (completionScreen) {
+                    const subtitle = completionScreen.querySelector('.completion-subtitle');
+                    const icon = completionScreen.querySelector('.completion-icon');
+                    
+                    subtitle.innerHTML = `Submission failed: ${error.message}<br><small>Please try refreshing the page</small>`;
+                    icon.textContent = '❌';
+                }
+            }
+        }
+        
+        // Event delegation for button clicks
+        questionContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn') || e.target.classList.contains('scale-btn')) {
+                const field = e.target.getAttribute('data-field');
+                const value = e.target.getAttribute('data-value');
+                handleAnswer(field, value);
+            }
+        });
+        
+        // Initialize - render first question
+        renderQuestion(currentQuestion);
+        updateProgress();
+        
+        // Prevent zoom on double-tap for iOS
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>
