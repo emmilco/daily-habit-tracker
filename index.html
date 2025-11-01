@@ -388,7 +388,7 @@
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
-            <div class="question-counter" id="questionCounter">Question 1 of 13</div>
+            <div class="question-counter" id="questionCounter">Question 1 of 17</div>
             <h1>Daily Check-in</h1>
         </div>
         
@@ -400,7 +400,7 @@
     <script>
         const formData = {};
         let currentQuestion = 0;
-        const totalQuestions = 13;
+        const totalQuestions = 17;
         
         // Replace with your actual Google Apps Script URL
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMNEMDZH1tZSRR_OnOTuEx0Dd7L7pwMXfx62qGqJF7hd614slaSua4u1n9v0BgQx_7gA/exec';
@@ -480,6 +480,26 @@
                 field: "scale5",
                 type: "scale",
                 labels: ["Lost", "Totally on track"]
+            },
+            {
+                text: "Did you socialize in person today?",
+                field: "question9",
+                type: "yesno"
+            },
+            {
+                text: "Did you water the plants?",
+                field: "question10",
+                type: "yesno"
+            },
+            {
+                text: "Did you record a poem?",
+                field: "question11",
+                type: "yesno"
+            },
+            {
+                text: "Did you do the dishes?",
+                field: "question12",
+                type: "yesno"
             }
         ];
         
@@ -703,6 +723,10 @@
                     formData.scale3,
                     formData.scale4,
                     formData.scale5,
+                    formData.question9,
+                    formData.question10,
+                    formData.question11,
+                    formData.question12,
                     location
                 ];
                 
