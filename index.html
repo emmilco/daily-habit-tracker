@@ -518,109 +518,47 @@
     <script>
         const formData = {};
         let currentQuestion = 0;
-        const totalQuestions = 17;
-        
+        let totalQuestions = 0;
+        let questions = [];
+
         // Replace with your actual Google Apps Script URL
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMNEMDZH1tZSRR_OnOTuEx0Dd7L7pwMXfx62qGqJF7hd614slaSua4u1n9v0BgQx_7gA/exec';
-        
+
         const questionContainer = document.getElementById('questionContainer');
         const progressFill = document.getElementById('progressFill');
         const questionCounter = document.getElementById('questionCounter');
         const backButton = document.getElementById('backButton');
-        
-        // Question data
-        const questions = [
-            {
-                text: "Did you get up on time?",
-                field: "question1",
-                type: "yesno"
-            },
-            {
-                text: "Did you go to bed on time?<br>Sleep without major disruptions?",
-                field: "question2",
-                type: "yesno"
-            },
-            {
-                text: "Did you do cardio?",
-                field: "question3",
-                type: "yesno"
-            },
-            {
-                text: "Do any creative writing?",
-                field: "question4",
-                type: "yesno"
-            },
-            {
-                text: "Did you lift?",
-                field: "question5",
-                type: "yesno"
-            },
-            {
-                text: "Iontophoresis?",
-                field: "question6",
-                type: "yesno"
-            },
-            {
-                text: "How severe was your reflux today?",
-                field: "scale1",
-                type: "scale",
-                labels: ["No reflux", "Severe"]
-            },
-            {
-                text: "How dry were your hands today?",
-                field: "scale2",
-                type: "scale",
-                labels: ["Bone dry", "Very sweaty"]
-            },
-            {
-                text: "Did you smoke yesterday?",
-                field: "question7",
-                type: "yesno"
-            },
-            {
-                text: "Did you do any interview prep today?",
-                field: "question8",
-                type: "yesno"
-            },
-            {
-                text: "How focused did you feel today?",
-                field: "scale3",
-                type: "scale",
-                labels: ["Couldn't focus", "Did everything I planned"]
-            },
-            {
-                text: "How much sadness did you feel today?",
-                field: "scale4",
-                type: "scale",
-                labels: ["None", "Sad all day"]
-            },
-            {
-                text: "How \"on track\" do you feel about life generally?",
-                field: "scale5",
-                type: "scale",
-                labels: ["Lost", "Totally on track"]
-            },
-            {
-                text: "Did you socialize in person today?",
-                field: "question9",
-                type: "yesno"
-            },
-            {
-                text: "Did you water the plants?",
-                field: "question10",
-                type: "yesno"
-            },
-            {
-                text: "Did you record a poem?",
-                field: "question11",
-                type: "yesno"
-            },
-            {
-                text: "Did you do the dishes?",
-                field: "question12",
-                type: "yesno"
+
+        // Load questions from config file
+        async function loadQuestions() {
+            try {
+                const response = await fetch('questions.json');
+                const config = await response.json();
+                questions = config.questions.map(q => {
+                    // Convert minLabel/maxLabel to labels array for compatibility
+                    if (q.type === 'scale') {
+                        return {
+                            ...q,
+                            labels: [q.minLabel, q.maxLabel]
+                        };
+                    }
+                    return q;
+                });
+                totalQuestions = questions.length;
+
+                // Initialize the app after questions are loaded
+                renderQuestion(currentQuestion);
+                updateProgress();
+            } catch (error) {
+                console.error('Failed to load questions:', error);
+                questionContainer.innerHTML = `
+                    <div style="text-align: center; color: #e74c3c;">
+                        <p>Failed to load questions.</p>
+                        <p style="font-size: 14px; margin-top: 8px;">Please refresh the page.</p>
+                    </div>
+                `;
             }
-        ];
+        }
         
         function updateProgress() {
             const progress = (currentQuestion / totalQuestions) * 100;
@@ -965,10 +903,9 @@
             }, 500);
         });
         
-        // Initialize - render first question
-        renderQuestion(currentQuestion);
-        updateProgress();
-        
+        // Initialize - load questions then render first question
+        loadQuestions();
+
         // Prevent zoom on double-tap for iOS
         let lastTouchEnd = 0;
         document.addEventListener('touchend', function (event) {

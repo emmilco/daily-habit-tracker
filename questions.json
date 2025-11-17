@@ -1,0 +1,99 @@
+{
+  "questions": [
+    {
+      "type": "yesno",
+      "text": "Did you get up on time?",
+      "field": "question1"
+    },
+    {
+      "type": "yesno",
+      "text": "Did you go to bed on time?<br>Sleep without major disruptions?",
+      "field": "question2"
+    },
+    {
+      "type": "yesno",
+      "text": "Did you do cardio?",
+      "field": "question3"
+    },
+    {
+      "type": "yesno",
+      "text": "Do any creative writing?",
+      "field": "question4"
+    },
+    {
+      "type": "yesno",
+      "text": "Did you lift?",
+      "field": "question5"
+    },
+    {
+      "type": "yesno",
+      "text": "Iontophoresis?",
+      "field": "question6"
+    },
+    {
+      "type": "scale",
+      "text": "How severe was your reflux today?",
+      "field": "scale1",
+      "minLabel": "No reflux",
+      "maxLabel": "Severe"
+    },
+    {
+      "type": "scale",
+      "text": "How dry were your hands today?",
+      "field": "scale2",
+      "minLabel": "Bone dry",
+      "maxLabel": "Very sweaty"
+    },
+    {
+      "type": "yesno",
+      "text": "Did you smoke yesterday?",
+      "field": "question7"
+    },
+    {
+      "type": "yesno",
+      "text": "Did you do any interview prep today?",
+      "field": "question8"
+    },
+    {
+      "type": "scale",
+      "text": "How focused did you feel today?",
+      "field": "scale3",
+      "minLabel": "Couldn't focus",
+      "maxLabel": "Did everything I planned"
+    },
+    {
+      "type": "scale",
+      "text": "How much sadness did you feel today?",
+      "field": "scale4",
+      "minLabel": "None",
+      "maxLabel": "Sad all day"
+    },
+    {
+      "type": "scale",
+      "text": "How \"on track\" do you feel about life generally?",
+      "field": "scale5",
+      "minLabel": "Lost",
+      "maxLabel": "Totally on track"
+    },
+    {
+      "type": "yesno",
+      "text": "Did you socialize in person today?",
+      "field": "question9"
+    },
+    {
+      "type": "yesno",
+      "text": "Did you water the plants?",
+      "field": "question10"
+    },
+    {
+      "type": "yesno",
+      "text": "Did you record a poem?",
+      "field": "question11"
+    },
+    {
+      "type": "yesno",
+      "text": "Did you do the dishes?",
+      "field": "question12"
+    }
+  ]
+}
