@@ -27,37 +27,107 @@
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            padding: 40px 32px;
+            padding: 24px 32px;
             max-width: 400px;
             width: 100%;
-            min-height: 500px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            min-height: 380px;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 12px;
+            padding-top: 40px;
+            position: relative;
+        }
+
+        .back-button {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, calc(-50% + 280px));
+            background: white;
+            border: 3px solid #e0e0e0;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 48px;
+            line-height: 1;
+            color: #999;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            padding-bottom: 4px;
+        }
+
+        .back-button.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .back-button:hover {
+            transform: translate(-50%, calc(-50% + 280px)) scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            border-color: #667eea;
+        }
+
+        .back-button:active {
+            transform: translate(-50%, calc(-50% + 280px)) scale(0.95);
         }
         
         .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: #e0e0e0;
-            border-radius: 2px;
-            margin-bottom: 20px;
-            overflow: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 36px;
+            background: linear-gradient(to bottom, #f8f8f8, #ececec);
+            border-radius: 20px 20px 0 0;
+            overflow: visible;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
         }
-        
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.5));
+            pointer-events: none;
+        }
+
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
             width: 0%;
-            transition: width 0.4s ease;
-            border-radius: 2px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 20px 0 0 0;
+            box-shadow: 0 2px 12px rgba(102, 126, 234, 0.5);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), transparent);
+            border-radius: 20px 0 0 0;
         }
         
         .question-counter {
@@ -73,18 +143,24 @@
         }
         
         .question-container {
-            min-height: 200px;
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            min-height: 180px;
         }
-        
+
         .question {
             width: 100%;
             text-align: center;
             opacity: 0;
             transform: translateX(50px);
             transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         
         .question.active {
@@ -104,10 +180,14 @@
         
         .question-text {
             font-weight: 600;
-            margin-bottom: 32px;
+            margin-bottom: 16px;
             color: #333;
             font-size: 20px;
             line-height: 1.4;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .button-group {
@@ -335,32 +415,53 @@
             body {
                 padding: 16px;
             }
-            
+
             .container {
-                padding: 32px 24px;
-                min-height: 450px;
+                padding: 20px 24px;
+                min-height: 340px;
                 border-radius: 16px;
             }
-            
+
+            .back-button {
+                transform: translate(-50%, calc(-50% + 230px));
+            }
+
+            .back-button:hover {
+                transform: translate(-50%, calc(-50% + 230px)) scale(1.1);
+            }
+
+            .back-button:active {
+                transform: translate(-50%, calc(-50% + 230px)) scale(0.95);
+            }
+
             .question-text {
                 font-size: 18px;
-                margin-bottom: 28px;
+                margin-bottom: 14px;
+                min-height: 56px;
             }
-            
+
             .btn {
                 min-width: 100px;
                 padding: 14px 20px;
                 font-size: 15px;
             }
-            
+
             .scale-btn {
                 width: 48px;
                 height: 48px;
                 font-size: 16px;
             }
-            
+
             .scale-group {
                 gap: 8px;
+            }
+
+            .back-button {
+                width: 72px;
+                height: 72px;
+                font-size: 42px;
+                bottom: 32px;
+                padding-bottom: 3px;
             }
         }
         
@@ -370,32 +471,49 @@
                 min-height: auto;
                 padding: 24px;
             }
-            
+
             .question-container {
-                min-height: 160px;
+                min-height: 140px;
             }
-            
+
             .question-text {
-                margin-bottom: 24px;
+                margin-bottom: 12px;
                 font-size: 18px;
+                min-height: 50px;
+            }
+
+            .back-button {
+                transform: translate(-50%, calc(-50% + 170px));
+            }
+
+            .back-button:hover {
+                transform: translate(-50%, calc(-50% + 170px)) scale(1.1);
+            }
+
+            .back-button:active {
+                transform: translate(-50%, calc(-50% + 170px)) scale(0.95);
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
         <div class="header">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
             <div class="question-counter" id="questionCounter">Question 1 of 17</div>
             <h1>Daily Check-in</h1>
         </div>
-        
+
         <div class="question-container" id="questionContainer">
             <!-- Current question will be rendered here dynamically -->
         </div>
     </div>
+
+    <button type="button" class="back-button" id="backButton" aria-label="Go back">
+        ←
+    </button>
 
     <script>
         const formData = {};
@@ -408,6 +526,7 @@
         const questionContainer = document.getElementById('questionContainer');
         const progressFill = document.getElementById('progressFill');
         const questionCounter = document.getElementById('questionCounter');
+        const backButton = document.getElementById('backButton');
         
         // Question data
         const questions = [
@@ -507,6 +626,51 @@
             const progress = (currentQuestion / totalQuestions) * 100;
             progressFill.style.width = `${progress}%`;
             questionCounter.textContent = `Question ${currentQuestion + 1} of ${totalQuestions}`;
+            updateBackButton();
+        }
+
+        function updateBackButton() {
+            const container = document.querySelector('.container');
+            if (currentQuestion > 0) {
+                backButton.classList.add('visible');
+                container.classList.add('show-back-button');
+            } else {
+                backButton.classList.remove('visible');
+                container.classList.remove('show-back-button');
+            }
+        }
+
+        function goBack() {
+            if (currentQuestion > 0) {
+                // Exit current question
+                const currentQuestionEl = questionContainer.querySelector('.question');
+                if (currentQuestionEl) {
+                    currentQuestionEl.classList.remove('active');
+                    currentQuestionEl.classList.add('exiting');
+                }
+
+                setTimeout(() => {
+                    currentQuestion--;
+                    renderQuestion(currentQuestion);
+                    updateProgress();
+
+                    // Restore previous answer if it exists
+                    const question = questions[currentQuestion];
+                    const previousAnswer = formData[question.field];
+
+                    if (previousAnswer) {
+                        // Find and highlight the previously selected button
+                        setTimeout(() => {
+                            const buttons = questionContainer.querySelectorAll('.btn, .scale-btn');
+                            buttons.forEach(btn => {
+                                if (btn.getAttribute('data-value') === previousAnswer) {
+                                    btn.classList.add('selected');
+                                }
+                            });
+                        }, 50);
+                    }
+                }, 300);
+            }
         }
         
         function renderQuestion(questionIndex) {
@@ -766,18 +930,24 @@
             }
         }
         
+        // Back button click handler
+        backButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            goBack();
+        });
+
         // Event delegation for button clicks
         questionContainer.addEventListener('click', function(e) {
             if (e.target.classList.contains('btn') || e.target.classList.contains('scale-btn')) {
                 const field = e.target.getAttribute('data-field');
                 const value = e.target.getAttribute('data-value');
-                
+
                 // Force remove hover state on iOS by temporarily disabling pointer events
                 e.target.style.pointerEvents = 'none';
                 setTimeout(() => {
                     e.target.style.pointerEvents = '';
                 }, 300);
-                
+
                 handleAnswer(field, value);
             }
         });
