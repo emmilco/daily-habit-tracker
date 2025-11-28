@@ -38,17 +38,17 @@
 
         @keyframes particle {
             0% {
-                transform: translateY(100vh) translateX(0) scale(0);
+                transform: translateY(0) translateX(0) scale(1);
                 opacity: 0;
             }
-            10% {
-                opacity: 1;
+            5% {
+                opacity: 0.8;
             }
-            90% {
-                opacity: 1;
+            95% {
+                opacity: 0.8;
             }
             100% {
-                transform: translateY(-100vh) translateX(100px) scale(1);
+                transform: translateY(-120vh) translateX(50px) scale(1);
                 opacity: 0;
             }
         }
@@ -142,9 +142,11 @@
             left: 15%;
             width: 500px;
             height: 500px;
-            background: radial-gradient(circle, rgba(0, 255, 255, 0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.5) 0%, transparent 70%);
             filter: blur(80px);
             animation: blob 25s ease-in-out infinite, float 15s ease-in-out infinite;
+            opacity: var(--blob-opacity, 0.3);
+            transition: opacity 0.8s ease;
             z-index: 0;
             pointer-events: none;
         }
@@ -156,9 +158,11 @@
             right: 20%;
             width: 450px;
             height: 450px;
-            background: radial-gradient(circle, rgba(0, 200, 255, 0.12) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 200, 255, 0.5) 0%, transparent 70%);
             filter: blur(70px);
             animation: blob 20s ease-in-out infinite reverse, float 12s ease-in-out infinite;
+            opacity: var(--blob-opacity, 0.25);
+            transition: opacity 0.8s ease;
             z-index: 0;
             pointer-events: none;
         }
@@ -166,13 +170,16 @@
         /* Floating Particles */
         .particle {
             position: fixed;
-            width: 4px;
-            height: 4px;
+            bottom: -50px;
+            width: var(--particle-size, 6px);
+            height: var(--particle-size, 6px);
             background: rgba(0, 255, 255, 0.6);
             border-radius: 50%;
+            transition: width 0.5s ease, height 0.5s ease;
             pointer-events: none;
             z-index: 1;
             box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            animation-fill-mode: backwards;
         }
 
         body::after {
@@ -287,6 +294,7 @@
                 0 8px 24px rgba(0, 0, 0, 0.4),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
             padding-bottom: 4px;
+            padding-right: 4px;
         }
 
         .back-button.visible {
@@ -309,68 +317,85 @@
         }
         
         .progress-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 24px 24px 0 0;
-            overflow: visible;
-            box-shadow:
-                inset 0 2px 4px rgba(0, 0, 0, 0.2),
-                inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+            display: none;
         }
 
-        .progress-bar::after {
-            content: '';
+        .progress-fill {
+            display: none;
+        }
+
+        /* Progress elements hidden */
+        .progress-border {
+            display: none;
+        }
+
+        .progress-border-glow {
+            display: none;
+        }
+
+        /* Shadow depth - grows with progress */
+        .container {
+            --shadow-depth: 20px;
+            --shadow-blur: 60px;
+            --shadow-spread: 0px;
+            box-shadow:
+                0 var(--shadow-depth) var(--shadow-blur) var(--shadow-spread) rgba(0, 0, 0, 0.6),
+                0 0 60px rgba(0, 255, 255, 0.1);
+            transition: box-shadow 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Vertical side gauge */
+        .side-gauge {
+            position: fixed;
+            left: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .side-gauge-fill {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 8px;
-            background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.15));
-            pointer-events: none;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg,
-                #00d4ff 0%,
-                #00e5ff 50%,
-                #00ffff 100%);
-            width: 0%;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 24px 0 0 0;
+            height: 0%;
+            background: linear-gradient(to top, #00d4ff, #00ffff);
+            border-radius: 3px;
+            transition: height 0.8s cubic-bezier(0.22, 1, 0.36, 1);
             box-shadow:
-                0 0 20px rgba(0, 255, 255, 0.6),
-                0 0 40px rgba(0, 255, 255, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-            position: relative;
+                0 0 20px rgba(0, 255, 255, 0.8),
+                0 0 40px rgba(0, 255, 255, 0.4);
         }
 
-        .progress-fill::before {
-            content: '';
+        .side-gauge-glow {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 50%;
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
-            border-radius: 24px 0 0 0;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 0%;
+            background: radial-gradient(ellipse at center, rgba(0, 255, 255, 0.4), transparent);
+            filter: blur(8px);
+            transition: height 0.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            right: 0;
-            width: 60px;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2));
-            transform: translateY(-50%);
-            filter: blur(10px);
-            animation: shimmer 2s infinite;
+        @media (max-width: 768px) {
+            .side-gauge {
+                left: 16px;
+                height: 150px;
+                width: 4px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .side-gauge {
+                display: none;
+            }
         }
 
         @keyframes shimmer {
@@ -882,8 +907,8 @@
         /* Circular Progress Indicator */
         .circular-progress {
             position: absolute;
-            top: 8px;
-            right: 8px;
+            top: 16px;
+            right: 16px;
             width: 56px;
             height: 56px;
         }
@@ -1114,7 +1139,7 @@
             .circular-progress {
                 width: 48px;
                 height: 48px;
-                top: 12px;
+                top: 16px;
                 right: 12px;
             }
 
@@ -1247,8 +1272,14 @@
     <div class="custom-cursor" id="customCursor"></div>
 
     <!-- Morphing Blobs -->
-    <div class="blob-1"></div>
-    <div class="blob-2"></div>
+    <div class="blob-1" id="blob1"></div>
+    <div class="blob-2" id="blob2"></div>
+
+    <!-- Side Gauge -->
+    <div class="side-gauge">
+        <div class="side-gauge-glow" id="sideGaugeGlow"></div>
+        <div class="side-gauge-fill" id="sideGaugeFill"></div>
+    </div>
 
     <!-- Dynamic Progress Orb -->
     <div class="progress-orb" id="progressOrb"></div>
@@ -1263,6 +1294,8 @@
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
         </div>
+        <div class="progress-border-glow" id="progressBorderGlow"></div>
+        <div class="progress-border" id="progressBorder"></div>
 
         <!-- Circular Progress Indicator -->
         <div class="circular-progress">
@@ -1308,12 +1341,15 @@
         let currentQuestion = 0;
         let totalQuestions = 0;
         let questions = [];
+        let cachedLocation = null;
 
         // Replace with your actual Google Apps Script URL
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMNEMDZH1tZSRR_OnOTuEx0Dd7L7pwMXfx62qGqJF7hd614slaSua4u1n9v0BgQx_7gA/exec';
 
         const questionContainer = document.getElementById('questionContainer');
         const progressFill = document.getElementById('progressFill');
+        const progressBorder = document.getElementById('progressBorder');
+        const progressBorderGlow = document.getElementById('progressBorderGlow');
         const questionCounter = document.getElementById('questionCounter');
         const backButton = document.getElementById('backButton');
         const circleProgress = document.getElementById('circleProgress');
@@ -1356,23 +1392,70 @@
         }
 
         // Create floating particles
-        function createParticles() {
-            const particleCount = 20;
-            for (let i = 0; i < particleCount; i++) {
-                setTimeout(() => {
-                    const particle = document.createElement('div');
-                    particle.classList.add('particle');
-                    particle.style.left = Math.random() * 100 + '%';
-                    particle.style.animation = `particle ${10 + Math.random() * 20}s linear infinite`;
-                    particle.style.animationDelay = Math.random() * 10 + 's';
-                    particleContainer.appendChild(particle);
-                }, i * 200);
-            }
+        let currentParticleCount = 0;
+        const baseParticleCount = 15;
+        const maxParticleCount = 300;
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+
+            // Random depth layer (0-1, affects size, opacity, blur, speed)
+            const depth = Math.random();
+            particle.dataset.depth = depth;
+
+            // Position
+            particle.style.left = Math.random() * 100 + '%';
+
+            // Depth affects speed (deeper = slower, closer = faster)
+            const duration = 12 + (1 - depth) * 20; // 12-32s
+            particle.style.animation = `particle ${duration}s linear infinite`;
+            particle.style.animationDelay = Math.random() * 8 + 's';
+
+            // Depth affects opacity (deeper = more faded)
+            const baseOpacity = 0.15 + depth * 0.25; // 0.15-0.4
+            particle.style.opacity = baseOpacity;
+
+            // Depth affects blur (deeper = more blur)
+            const blur = (1 - depth) * 3; // 0-3px blur for distant ones
+            particle.style.filter = `blur(${blur}px)`;
+
+            // Depth affects z-index - most behind form (z-index 2), few in front
+            // Only top 15% of depth values go in front of form
+            const zIndex = depth > 0.85 ? 3 + Math.floor((depth - 0.85) * 40) : Math.floor(depth * 2);
+            particle.style.zIndex = zIndex;
+
+            // Random size multiplier for variety
+            particle.dataset.sizeMultiplier = 0.4 + Math.random() * 1.2; // 0.4x to 1.6x
+
+            particleContainer.appendChild(particle);
+            currentParticleCount++;
         }
 
-        // Initialize particles
+        function updateParticles(progress) {
+            // Calculate target particle count based on progress (8 to 40)
+            const targetCount = Math.floor(baseParticleCount + (progress / 100) * (maxParticleCount - baseParticleCount));
+
+            // Add particles if needed
+            while (currentParticleCount < targetCount) {
+                createParticle();
+            }
+
+            // Update particle size based on progress (6px to 90px base, varied by multiplier)
+            const baseSize = 6 + (progress / 100) * 84;
+            const particles = particleContainer.querySelectorAll('.particle');
+            particles.forEach(p => {
+                const multiplier = parseFloat(p.dataset.sizeMultiplier) || 1;
+                const size = baseSize * multiplier;
+                p.style.setProperty('--particle-size', `${size}px`);
+            });
+        }
+
+        // Initialize base particles
         if (window.innerWidth > 768) {
-            createParticles();
+            for (let i = 0; i < baseParticleCount; i++) {
+                setTimeout(() => createParticle(), i * 200);
+            }
         }
 
         // Create journey dots
@@ -1563,6 +1646,9 @@
                 createJourneyDots();
                 renderQuestion(currentQuestion);
                 updateProgress();
+
+                // Pre-fetch location in background so it's ready at submission
+                getUserLocation().then(loc => { cachedLocation = loc; });
             } catch (error) {
                 console.error('Failed to load questions:', error);
                 questionContainer.innerHTML = `
@@ -1577,6 +1663,34 @@
         function updateProgress() {
             const progress = (currentQuestion / totalQuestions) * 100;
             progressFill.style.width = `${progress}%`;
+
+            // Shadow depth: grows deeper with progress (more dramatic)
+            const container = document.querySelector('.container');
+            const shadowDepth = 20 + (progress / 100) * 80; // 20px to 100px
+            const shadowBlur = 60 + (progress / 100) * 100; // 60px to 160px
+            const shadowSpread = (progress / 100) * 20; // 0px to 20px
+            container.style.setProperty('--shadow-depth', `${shadowDepth}px`);
+            container.style.setProperty('--shadow-blur', `${shadowBlur}px`);
+            container.style.setProperty('--shadow-spread', `${shadowSpread}px`);
+
+            // Blobs react: opacity increases with progress
+            const blob1 = document.getElementById('blob1');
+            const blob2 = document.getElementById('blob2');
+            const blobOpacity = 0.3 + (progress / 100) * 0.7; // 0.3 to 1.0
+            blob1.style.setProperty('--blob-opacity', blobOpacity);
+            blob2.style.setProperty('--blob-opacity', blobOpacity * 0.85);
+
+            // Side gauge fill
+            const sideGaugeFill = document.getElementById('sideGaugeFill');
+            const sideGaugeGlow = document.getElementById('sideGaugeGlow');
+            sideGaugeFill.style.height = `${progress}%`;
+            sideGaugeGlow.style.height = `${progress}%`;
+
+            // Particles grow bigger and more numerous
+            if (window.innerWidth > 768) {
+                updateParticles(progress);
+            }
+
             questionCounter.textContent = `Question ${currentQuestion + 1} of ${totalQuestions}`;
             updateCircularProgress();
             updateJourneyDots();
@@ -1711,11 +1825,31 @@
                 // Auto-submit after showing completion screen
                 setTimeout(() => {
                     handleSubmit();
-                }, 1000);
+                }, 300);
             }, 10);
 
             questionCounter.textContent = 'Complete!';
             progressFill.style.width = '100%';
+
+            // Max out all progress effects
+            const container = document.querySelector('.container');
+            container.style.setProperty('--shadow-depth', '100px');
+            container.style.setProperty('--shadow-blur', '160px');
+            container.style.setProperty('--shadow-spread', '20px');
+
+            const blob1 = document.getElementById('blob1');
+            const blob2 = document.getElementById('blob2');
+            blob1.style.setProperty('--blob-opacity', '1');
+            blob2.style.setProperty('--blob-opacity', '0.85');
+
+            document.getElementById('sideGaugeFill').style.height = '100%';
+            document.getElementById('sideGaugeGlow').style.height = '100%';
+
+            // Max out particles
+            if (window.innerWidth > 768) {
+                updateParticles(100);
+            }
+
             updateCircularProgress();
         }
         
@@ -1763,7 +1897,7 @@
                         // Last question answered - show completion and auto-submit
                         renderCompletionScreen();
                     }
-                }, 300);
+                }, 160);
             }
         }
         
@@ -1784,7 +1918,7 @@
                 // Clear the selection styling before moving to next question
                 buttons.forEach(btn => btn.classList.remove('selected'));
                 showNextQuestion();
-            }, 250);
+            }, 120);
         }
         
         async function getUserLocation() {
@@ -1829,8 +1963,8 @@
                 const utcDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
                 const utcTime = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS
                 
-                // Get user location
-                const location = await getUserLocation();
+                // Use pre-fetched location if available, otherwise fetch now
+                const location = cachedLocation || await getUserLocation();
                 
                 // Create comma-separated string with date/time first, then responses, then location
                 const responses = [
@@ -1842,17 +1976,20 @@
                     formData.question4,
                     formData.question5,
                     formData.question6,
-                    formData.scale1,
-                    formData.scale2,
                     formData.question7,
                     formData.question8,
-                    formData.scale3,
-                    formData.scale4,
-                    formData.scale5,
                     formData.question9,
                     formData.question10,
                     formData.question11,
                     formData.question12,
+                    formData.scale1,
+                    formData.scale2,
+                    formData.scale3,
+                    formData.scale4,
+                    formData.scale5,
+                    formData.scale6,
+                    formData.scale7,
+                    formData.scale8,
                     location
                 ];
                 

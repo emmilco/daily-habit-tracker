@@ -7,46 +7,32 @@
     },
     {
       "type": "yesno",
-      "text": "Did you go to bed on time?<br>Sleep without major disruptions?",
+      "text": "Did you do cardio?",
       "field": "question2"
     },
     {
       "type": "yesno",
-      "text": "Did you do cardio?",
+      "text": "Did you record a poem?",
       "field": "question3"
     },
     {
       "type": "yesno",
-      "text": "Do any creative writing?",
+      "text": "Did you water the plants?",
       "field": "question4"
     },
     {
       "type": "yesno",
-      "text": "Did you lift?",
+      "text": "Did you do the dishes?",
       "field": "question5"
     },
     {
       "type": "yesno",
-      "text": "Iontophoresis?",
+      "text": "Did you lift?",
       "field": "question6"
     },
     {
-      "type": "scale",
-      "text": "How severe was your reflux today?",
-      "field": "scale1",
-      "minLabel": "No reflux",
-      "maxLabel": "Severe"
-    },
-    {
-      "type": "scale",
-      "text": "How dry were your hands today?",
-      "field": "scale2",
-      "minLabel": "Bone dry",
-      "maxLabel": "Very sweaty"
-    },
-    {
       "type": "yesno",
-      "text": "Did you smoke yesterday?",
+      "text": "Iontophoresis?",
       "field": "question7"
     },
     {
@@ -55,45 +41,80 @@
       "field": "question8"
     },
     {
+      "type": "yesno",
+      "text": "Do any creative writing?",
+      "field": "question9"
+    },
+    {
+      "type": "yesno",
+      "text": "Did you socialize in person today?",
+      "field": "question10"
+    },
+    {
+      "type": "yesno",
+      "text": "Did you smoke yesterday?",
+      "field": "question11"
+    },
+    {
+      "type": "yesno",
+      "text": "Did you go to bed on time?<br>Sleep without major disruptions?",
+      "field": "question12"
+    },
+    {
+      "type": "scale",
+      "text": "How many cups of caffeine did you have?",
+      "field": "scale1",
+      "minLabel": "0 cups",
+      "maxLabel": "5+ cups"
+    },
+    {
+      "type": "scale",
+      "text": "How severe was your reflux today?",
+      "field": "scale2",
+      "minLabel": "No reflux",
+      "maxLabel": "Severe"
+    },
+    {
+      "type": "scale",
+      "text": "How dry were your hands today?",
+      "field": "scale3",
+      "minLabel": "Bone dry",
+      "maxLabel": "Very sweaty"
+    },
+    {
+      "type": "scale",
+      "text": "What was your energy level today?",
+      "field": "scale4",
+      "minLabel": "Exhausted",
+      "maxLabel": "Full of energy"
+    },
+    {
+      "type": "scale",
+      "text": "What was your stress level today?",
+      "field": "scale5",
+      "minLabel": "No stress",
+      "maxLabel": "Extremely stressed"
+    },
+    {
       "type": "scale",
       "text": "How focused did you feel today?",
-      "field": "scale3",
+      "field": "scale6",
       "minLabel": "Couldn't focus",
       "maxLabel": "Did everything I planned"
     },
     {
       "type": "scale",
       "text": "How much sadness did you feel today?",
-      "field": "scale4",
+      "field": "scale7",
       "minLabel": "None",
       "maxLabel": "Sad all day"
     },
     {
       "type": "scale",
       "text": "How \"on track\" do you feel about life generally?",
-      "field": "scale5",
+      "field": "scale8",
       "minLabel": "Lost",
       "maxLabel": "Totally on track"
-    },
-    {
-      "type": "yesno",
-      "text": "Did you socialize in person today?",
-      "field": "question9"
-    },
-    {
-      "type": "yesno",
-      "text": "Did you water the plants?",
-      "field": "question10"
-    },
-    {
-      "type": "yesno",
-      "text": "Did you record a poem?",
-      "field": "question11"
-    },
-    {
-      "type": "yesno",
-      "text": "Did you do the dishes?",
-      "field": "question12"
     }
   ]
 }
