@@ -2,1317 +2,197 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Check-in</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            33% { transform: translateY(-20px) rotate(2deg); }
-            66% { transform: translateY(10px) rotate(-2deg); }
-        }
-
-        @keyframes meshGradient {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        @keyframes particle {
-            0% {
-                transform: translateY(0) translateX(0) scale(1);
-                opacity: 0;
-            }
-            5% {
-                opacity: 0.8;
-            }
-            95% {
-                opacity: 0.8;
-            }
-            100% {
-                transform: translateY(-120vh) translateX(50px) scale(1);
-                opacity: 0;
-            }
-        }
-
-        @keyframes textShine {
-            0% {
-                background-position: 0% center;
-            }
-            100% {
-                background-position: 200% center;
-            }
-        }
-
-        @keyframes blob {
-            0%, 100% {
-                border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-                transform: rotate(0deg) scale(1);
-            }
-            25% {
-                border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
-                transform: rotate(90deg) scale(1.1);
-            }
-            50% {
-                border-radius: 50% 50% 30% 60% / 30% 60% 70% 40%;
-                transform: rotate(180deg) scale(0.9);
-            }
-            75% {
-                border-radius: 60% 40% 50% 50% / 70% 30% 50% 60%;
-                transform: rotate(270deg) scale(1.05);
-            }
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg,
-                #0a0f14 0%,
-                #0d1b2a 25%,
-                #1b263b 50%,
-                #0d1b2a 75%,
-                #0a0f14 100%);
-            background-size: 400% 400%;
-            animation: meshGradient 20s ease infinite;
+            background: #fff;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            overflow-x: hidden;
-            position: relative;
-            cursor: none;
         }
 
-        /* Custom Cursor */
-        .custom-cursor {
-            position: fixed;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(0, 255, 255, 0.8);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 10000;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
-            background: radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, transparent 70%);
-        }
-
-        .custom-cursor.clicking {
-            transform: scale(0.8);
-            background: radial-gradient(circle, rgba(0, 255, 255, 0.6) 0%, transparent 70%);
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.9);
-        }
-
-        /* Noise Texture Overlay */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
+        .container {
+            background: #fff;
+            border: 1px solid #000;
+            padding: 40px;
+            max-width: 600px;
             width: 100%;
-            height: 100%;
-            opacity: 0.03;
-            z-index: 0;
-            pointer-events: none;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' /%3E%3C/svg%3E");
         }
 
-        /* Morphing Blob 1 */
-        .blob-1 {
-            position: fixed;
-            top: 10%;
-            left: 15%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(0, 255, 255, 0.5) 0%, transparent 70%);
-            filter: blur(80px);
-            animation: blob 25s ease-in-out infinite, float 15s ease-in-out infinite;
-            opacity: var(--blob-opacity, 0.3);
-            transition: opacity 0.8s ease;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* Morphing Blob 2 */
-        .blob-2 {
-            position: fixed;
-            bottom: 15%;
-            right: 20%;
-            width: 450px;
-            height: 450px;
-            background: radial-gradient(circle, rgba(0, 200, 255, 0.5) 0%, transparent 70%);
-            filter: blur(70px);
-            animation: blob 20s ease-in-out infinite reverse, float 12s ease-in-out infinite;
-            opacity: var(--blob-opacity, 0.25);
-            transition: opacity 0.8s ease;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* Floating Particles */
-        .particle {
-            position: fixed;
-            bottom: -50px;
-            width: var(--particle-size, 6px);
-            height: var(--particle-size, 6px);
-            background: rgba(0, 255, 255, 0.6);
-            border-radius: 50%;
-            transition: width 0.5s ease, height 0.5s ease;
-            pointer-events: none;
-            z-index: 1;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
-            animation-fill-mode: backwards;
-        }
-
-        body::after {
-            content: '';
-            position: fixed;
-            top: 20%;
-            right: 10%;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(0, 200, 255, 0.18) 0%, transparent 70%);
-            border-radius: 50%;
-            filter: blur(80px);
-            animation: float 12s ease-in-out infinite;
-            z-index: 0;
-            pointer-events: none;
-            transition: all 1s ease;
-        }
-
-        /* Dynamic background orb that moves based on progress */
-        .progress-orb {
-            position: fixed;
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, rgba(0, 230, 255, 0.15) 0%, transparent 70%);
-            border-radius: 50%;
-            filter: blur(70px);
-            z-index: 0;
-            pointer-events: none;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            left: 10%;
-            bottom: 10%;
-        }
-        
-        .container {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(40px) saturate(200%);
-            -webkit-backdrop-filter: blur(40px) saturate(200%);
-            border: 1px solid transparent;
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.04)),
-                linear-gradient(135deg,
-                    rgba(0, 255, 255, 0.4) 0%,
-                    rgba(0, 200, 255, 0.4) 25%,
-                    rgba(0, 255, 255, 0.4) 50%,
-                    rgba(100, 255, 255, 0.4) 75%,
-                    rgba(0, 255, 255, 0.4) 100%);
-            background-origin: border-box;
-            background-clip: padding-box, border-box;
-            border-radius: 32px;
-            box-shadow:
-                0 20px 60px 0 rgba(0, 0, 0, 0.5),
-                0 0 100px rgba(0, 255, 255, 0.3),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.1),
-                inset 0 0 60px rgba(0, 255, 255, 0.05);
-            padding: 48px 56px;
-            max-width: 680px;
-            width: 90%;
-            min-height: 500px;
-            position: relative;
-            overflow: visible;
-            display: flex;
-            flex-direction: column;
-            z-index: 2;
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            margin-left: 5%;
-            perspective: 1000px;
-            transform-style: preserve-3d;
-        }
-
-        .container:hover {
-            box-shadow:
-                0 30px 100px 0 rgba(0, 0, 0, 0.7),
-                0 0 150px rgba(0, 255, 255, 0.5),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
-                inset 0 0 80px rgba(0, 255, 255, 0.08);
-            transform: translateY(-8px) rotateX(2deg);
-        }
-        
         .header {
-            text-align: left;
-            margin-bottom: 32px;
-            padding-top: 24px;
-            position: relative;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 20px;
         }
 
-        .back-button {
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, calc(-50% + 300px));
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 2px solid rgba(138, 43, 226, 0.3);
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 48px;
-            line-height: 1;
-            color: rgba(255, 255, 255, 0.8);
-            width: 84px;
-            height: 84px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            box-shadow:
-                0 8px 24px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            padding-bottom: 4px;
-            padding-right: 4px;
-        }
-
-        .back-button.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .back-button:hover {
-            transform: translate(-50%, calc(-50% + 300px)) scale(1.08);
-            box-shadow:
-                0 12px 32px rgba(138, 43, 226, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            border-color: rgba(138, 43, 226, 0.6);
-            background: rgba(138, 43, 226, 0.15);
-            color: #fff;
-        }
-
-        .back-button:active {
-            transform: translate(-50%, calc(-50% + 300px)) scale(0.96);
-        }
-        
-        .progress-bar {
-            display: none;
-        }
-
-        .progress-fill {
-            display: none;
-        }
-
-        /* Progress elements hidden */
-        .progress-border {
-            display: none;
-        }
-
-        .progress-border-glow {
-            display: none;
-        }
-
-        /* Shadow depth - grows with progress */
-        .container {
-            --shadow-depth: 20px;
-            --shadow-blur: 60px;
-            --shadow-spread: 0px;
-            box-shadow:
-                0 var(--shadow-depth) var(--shadow-blur) var(--shadow-spread) rgba(0, 0, 0, 0.6),
-                0 0 60px rgba(0, 255, 255, 0.1);
-            transition: box-shadow 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        /* Vertical side gauge */
-        .side-gauge {
-            position: fixed;
-            left: 40px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 6px;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            overflow: hidden;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .side-gauge-fill {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 0%;
-            background: linear-gradient(to top, #00d4ff, #00ffff);
-            border-radius: 3px;
-            transition: height 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-            box-shadow:
-                0 0 20px rgba(0, 255, 255, 0.8),
-                0 0 40px rgba(0, 255, 255, 0.4);
-        }
-
-        .side-gauge-glow {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 0%;
-            background: radial-gradient(ellipse at center, rgba(0, 255, 255, 0.4), transparent);
-            filter: blur(8px);
-            transition: height 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        @media (max-width: 768px) {
-            .side-gauge {
-                left: 16px;
-                height: 150px;
-                width: 4px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .side-gauge {
-                display: none;
-            }
-        }
-
-        @keyframes shimmer {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-        
         .question-counter {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.4);
-            margin-bottom: 12px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 10px;
         }
 
         h1 {
-            background: linear-gradient(90deg,
-                #ffffff 0%,
-                #ccf7ff 25%,
-                #00ffff 50%,
-                #ccf7ff 75%,
-                #ffffff 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 36px;
-            font-weight: 800;
-            letter-spacing: -1px;
-            text-shadow: none;
-            filter: drop-shadow(0 4px 12px rgba(0, 255, 255, 0.4));
-            line-height: 1.2;
-            animation: textShine 8s linear infinite;
+            font-size: 24px;
+            font-weight: 700;
+            color: #000;
         }
-        
+
         .question-container {
-            flex: 1;
+            min-height: 200px;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            min-height: 180px;
         }
 
         .question {
             width: 100%;
             text-align: center;
-            opacity: 0;
-            transform: translateX(50px);
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .question.active {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        
-        .question.entering {
-            opacity: 0;
-            transform: translateX(50px);
-        }
-        
-        .question.exiting {
-            opacity: 0;
-            transform: translateX(-50px);
-        }
-        
-        .question-text {
-            font-weight: 800;
-            margin-bottom: 40px;
-            background: linear-gradient(90deg,
-                #ffffff 0%,
-                #e0f7ff 20%,
-                #b3f0ff 40%,
-                #00ffff 50%,
-                #b3f0ff 60%,
-                #e0f7ff 80%,
-                #ffffff 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 42px;
-            line-height: 1.3;
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            letter-spacing: -0.3px;
-            filter: drop-shadow(0 4px 20px rgba(0, 255, 255, 0.4))
-                    drop-shadow(0 0 40px rgba(255, 255, 255, 0.1));
-            text-align: left;
-            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1), textShine 6s linear infinite;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .question-text {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #000;
         }
-        
+
         .button-group {
             display: flex;
-            gap: 20px;
-            justify-content: flex-start;
-            align-items: center;
-            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s backwards;
+            gap: 15px;
+            justify-content: center;
         }
-        
+
         .btn {
-            min-width: 160px;
-            padding: 22px 40px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-radius: 20px;
+            min-width: 120px;
+            padding: 15px 30px;
+            border: 1px solid #000;
+            background: #fff;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 20px;
-            font-weight: 700;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.95);
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            outline: none;
-            box-shadow:
-                0 8px 24px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                inset 0 -2px 0 rgba(0, 0, 0, 0.2);
-            position: relative;
-            overflow: hidden;
-            letter-spacing: 0.5px;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn:focus {
-            outline: none;
-            border-color: rgba(138, 43, 226, 0.5);
-        }
-
-        .btn:active {
-            transform: scale(0.97);
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
         }
 
         .btn:hover {
-            border-color: rgba(0, 255, 255, 0.7);
-            background: rgba(0, 255, 255, 0.15);
-            transform: translateY(-4px) scale(1.02);
-            box-shadow:
-                0 12px 32px rgba(0, 255, 255, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            background: #f0f0f0;
         }
 
         .btn.selected {
-            background: linear-gradient(135deg, #00d4ff 0%, #00ffff 100%);
-            color: #0a0f14;
-            border-color: rgba(100, 255, 255, 0.9);
-            transform: scale(1.08);
-            box-shadow:
-                0 0 30px rgba(0, 255, 255, 0.8),
-                0 12px 40px rgba(0, 255, 255, 0.6),
-                inset 0 2px 0 rgba(255, 255, 255, 0.4);
-            font-weight: 800;
-        }
-        
-        /* Disable hover effects on touch devices */
-        @media (hover: none) and (pointer: coarse) {
-            .btn:hover {
-                border-color: rgba(255, 255, 255, 0.15);
-                background: rgba(255, 255, 255, 0.08);
-                transform: none;
-            }
-
-            .btn:hover::before {
-                left: -100%;
-            }
-
-            .scale-btn:hover {
-                border-color: rgba(255, 255, 255, 0.15);
-                background: rgba(255, 255, 255, 0.08);
-                transform: none;
-            }
+            background: #000;
+            color: #fff;
         }
 
-        /* Additional iOS hover fix */
-        .touching .btn:hover,
-        .touching .scale-btn:hover {
-            border-color: rgba(255, 255, 255, 0.15) !important;
-            background: rgba(255, 255, 255, 0.08) !important;
-            transform: none !important;
-        }
-        
         .scale-group {
             display: flex;
-            gap: 16px;
-            justify-content: flex-start;
-            flex-wrap: wrap;
-            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s backwards;
-        }
-        
-        .scale-btn {
-            width: 72px;
-            height: 72px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 800;
-            font-size: 24px;
-            color: rgba(255, 255, 255, 0.95);
-            display: flex;
-            align-items: center;
+            gap: 10px;
             justify-content: center;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            outline: none;
-            box-shadow:
-                0 8px 24px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                inset 0 -2px 0 rgba(0, 0, 0, 0.2);
-            position: relative;
         }
 
-        .scale-btn::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            right: 2px;
-            bottom: 2px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent);
-            pointer-events: none;
-        }
-
-        .scale-btn:focus {
-            outline: none;
-            border-color: rgba(138, 43, 226, 0.5);
-        }
-
-        .scale-btn:active {
-            transform: scale(0.92);
+        .scale-btn {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #000;
+            background: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 18px;
+            color: #000;
         }
 
         .scale-btn:hover {
-            border-color: rgba(0, 255, 255, 0.7);
-            background: rgba(0, 255, 255, 0.15);
-            transform: scale(1.12);
-            box-shadow:
-                0 12px 32px rgba(0, 255, 255, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            background: #f0f0f0;
         }
 
         .scale-btn.selected {
-            background: linear-gradient(135deg, #00d4ff 0%, #00ffff 100%);
-            color: #0a0f14;
-            border-color: rgba(100, 255, 255, 0.9);
-            transform: scale(1.18);
-            box-shadow:
-                0 0 32px rgba(0, 255, 255, 0.9),
-                0 12px 40px rgba(0, 255, 255, 0.7),
-                inset 0 2px 0 rgba(255, 255, 255, 0.5);
-            font-weight: 900;
+            background: #000;
+            color: #fff;
         }
-        
+
         .scale-labels {
             display: flex;
             justify-content: space-between;
-            margin-top: 24px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.5);
-            padding: 0;
-            font-weight: 600;
-            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
-            width: 100%;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #666;
         }
 
-        .scale-labels span:first-child {
-            text-align: left;
-        }
-
-        .scale-labels span:last-child {
-            text-align: right;
-        }
-
-        /* Side Progress Journey */
-        .progress-journey {
+        .back-button {
             position: fixed;
-            right: 40px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            z-index: 10;
-        }
-
-        .journey-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            bottom: 30px;
+            left: 30px;
+            background: #fff;
+            border: 1px solid #000;
             cursor: pointer;
-            position: relative;
+            font-size: 24px;
+            color: #000;
+            width: 50px;
+            height: 50px;
+            display: none;
         }
 
-        .journey-dot::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        .back-button.visible {
+            display: block;
         }
 
-        .journey-dot.completed {
-            background: rgba(0, 255, 255, 0.4);
-            box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
+        .back-button:hover {
+            background: #f0f0f0;
         }
 
-        .journey-dot.completed::after {
-            background: #00ffff;
-            width: 6px;
-            height: 6px;
-        }
-
-        .journey-dot.active {
-            background: linear-gradient(135deg, #00d4ff 0%, #00ffff 100%);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
-            transform: scale(1.4);
-            animation: breathe 2s ease-in-out infinite;
-        }
-
-        .journey-dot.active::after {
-            background: white;
-            width: 4px;
-            height: 4px;
-        }
-
-        @keyframes breathe {
-            0%, 100% {
-                box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
-            }
-            50% {
-                box-shadow: 0 0 30px rgba(0, 255, 255, 1);
-            }
-        }
-
-        .journey-dot:hover {
-            transform: scale(1.3);
-            background: rgba(0, 255, 255, 0.3);
-        }
-        
-        .completion-screen {
-            text-align: center;
-            opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.4s ease;
-        }
-        
-        .completion-screen.active {
-            opacity: 1;
-            transform: scale(1);
-        }
-        
-        .completion-icon {
-            font-size: 64px;
-            margin-bottom: 24px;
-            animation: bounce 0.6s ease;
-        }
-        
-        .completion-title {
-            background: linear-gradient(135deg, #ffffff 0%, #00ffff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 48px;
-            font-weight: 900;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 4px 20px rgba(0, 255, 255, 0.5));
-            letter-spacing: -1.5px;
-        }
-
-        .completion-subtitle {
-            font-size: 18px;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 32px;
-            font-weight: 500;
-        }
-        
-        .submit-btn {
-            padding: 18px 36px;
-            background: linear-gradient(135deg, #00d4ff 0%, #00ffff 100%);
-            color: #0a0f14;
-            border: 2px solid rgba(0, 255, 255, 0.5);
-            border-radius: 16px;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            touch-action: manipulation;
-            box-shadow:
-                0 0 20px rgba(0, 255, 255, 0.5),
-                0 8px 20px rgba(0, 255, 255, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-        }
-
-        .submit-btn:active {
-            transform: scale(0.96);
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-3px);
-            box-shadow:
-                0 0 30px rgba(0, 255, 255, 0.7),
-                0 12px 28px rgba(0, 255, 255, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4);
-            border-color: rgba(0, 255, 255, 0.8);
-        }
-
-        .submit-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
-        }
-        
+        .completion-screen,
         .success-screen {
             text-align: center;
-            opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.4s ease;
         }
-        
-        .success-screen.active {
-            opacity: 1;
-            transform: scale(1);
-        }
-        
+
+        .completion-icon,
         .success-icon {
-            font-size: 72px;
-            margin-bottom: 24px;
-            animation: bounce 0.6s ease;
-            filter: drop-shadow(0 4px 12px rgba(0, 255, 136, 0.5));
-        }
-
-        .success-title {
-            background: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
             font-size: 48px;
-            font-weight: 900;
             margin-bottom: 20px;
-            filter: drop-shadow(0 4px 20px rgba(0, 255, 136, 0.6));
-            letter-spacing: -1.5px;
         }
 
-        .success-subtitle {
-            font-size: 18px;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 500;
-        }
-
-        /* Circular Progress Indicator */
-        .circular-progress {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            width: 56px;
-            height: 56px;
-        }
-
-        .circular-progress svg {
-            transform: rotate(-90deg);
-            filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.4));
-        }
-
-        .circular-progress circle {
-            fill: none;
-            stroke-width: 4;
-        }
-
-        .circular-progress .circle-bg {
-            stroke: rgba(255, 255, 255, 0.1);
-        }
-
-        .circular-progress .circle-progress {
-            stroke: url(#gradient);
-            stroke-linecap: round;
-            transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .circular-progress-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 14px;
+        .completion-title,
+        .success-title {
+            font-size: 32px;
             font-weight: 700;
-            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 15px;
+            color: #000;
         }
 
-        /* Confetti Styles */
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background: #8a2be2;
+        .completion-subtitle,
+        .success-subtitle {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .progress-bar {
             position: absolute;
-            animation: confetti-fall 3s linear forwards;
-            z-index: 1000;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #f0f0f0;
         }
 
-        @keyframes confetti-fall {
-            0% {
-                transform: translateY(0) rotateZ(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotateZ(720deg);
-                opacity: 0;
-            }
-        }
-
-        /* Swipe Indicators */
-        .swipe-hint {
-            position: absolute;
-            bottom: -50px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .swipe-hint.visible {
-            opacity: 0.5;
-        }
-
-        .swipe-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .swipe-dot.active {
-            background: rgba(138, 43, 226, 0.8);
-            transform: scale(1.3);
-        }
-
-        /* Keyboard Shortcuts Hint */
-        .keyboard-hint {
-            position: absolute;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.4);
-            display: flex;
-            gap: 12px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .keyboard-hint.visible {
-            opacity: 1;
-        }
-
-        .keyboard-hint kbd {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            padding: 2px 6px;
-            font-family: monospace;
-            font-size: 10px;
-        }
-
-        /* Answer Celebration */
-        @keyframes celebrate {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-            100% { transform: scale(1); }
-        }
-
-        .btn.celebrating,
-        .scale-btn.celebrating {
-            animation: celebrate 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Pulse Effect */
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(138, 43, 226, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(138, 43, 226, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(138, 43, 226, 0); }
-        }
-
-        .btn.selected::after,
-        .scale-btn.selected::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 100%;
+        .progress-fill {
             height: 100%;
-            transform: translate(-50%, -50%);
-            animation: pulse 1s ease-out;
-            border-radius: inherit;
-        }
-
-        /* Enhanced Container with Swipe Support */
-        .container.swiping {
-            cursor: grabbing;
-        }
-
-        .question-container.swipe-left .question {
-            transform: translateX(-100px);
-            opacity: 0.5;
-        }
-
-        .question-container.swipe-right .question {
-            transform: translateX(100px);
-            opacity: 0.5;
-        }
-
-        /* Mobile optimizations */
-        @media (max-width: 768px) {
-            body {
-                cursor: auto;
-            }
-
-            .custom-cursor {
-                display: none;
-            }
-
-            .blob-1,
-            .blob-2 {
-                opacity: 0.5;
-            }
-
-            .container {
-                padding: 32px 32px;
-                min-height: 420px;
-                width: 95%;
-                margin-left: 0;
-            }
-
-            .container:hover {
-                transform: translateY(-4px);
-            }
-
-            h1 {
-                font-size: 28px;
-            }
-
-            .question-text {
-                font-size: 28px;
-                margin-bottom: 28px;
-                min-height: 80px;
-                justify-content: flex-start;
-            }
-
-            .btn {
-                min-width: 140px;
-                padding: 18px 32px;
-                font-size: 18px;
-            }
-
-            .scale-btn {
-                width: 64px;
-                height: 64px;
-                font-size: 20px;
-            }
-
-            .button-group {
-                gap: 16px;
-            }
-
-            .scale-group {
-                gap: 12px;
-            }
-
-            .progress-journey {
-                right: 20px;
-                gap: 10px;
-            }
-
-            .journey-dot {
-                width: 10px;
-                height: 10px;
-            }
-
-            .circular-progress {
-                width: 48px;
-                height: 48px;
-                top: 16px;
-                right: 12px;
-            }
-
-            .circular-progress svg {
-                width: 48px;
-                height: 48px;
-            }
-
-            .circular-progress-text {
-                font-size: 12px;
-            }
-
-            .completion-title,
-            .success-title {
-                font-size: 36px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 28px 24px;
-                min-height: 380px;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
-
-            .back-button {
-                transform: translate(-50%, calc(-50% + 250px));
-                width: 76px;
-                height: 76px;
-                font-size: 44px;
-                padding-bottom: 3px;
-            }
-
-            .back-button:hover {
-                transform: translate(-50%, calc(-50% + 250px)) scale(1.08);
-            }
-
-            .back-button:active {
-                transform: translate(-50%, calc(-50% + 250px)) scale(0.96);
-            }
-
-            .question-text {
-                font-size: 24px;
-                margin-bottom: 24px;
-                min-height: 70px;
-            }
-
-            .btn {
-                min-width: 120px;
-                padding: 16px 28px;
-                font-size: 17px;
-            }
-
-            .scale-btn {
-                width: 52px;
-                height: 52px;
-                font-size: 17px;
-            }
-
-            .button-group,
-            .scale-group {
-                justify-content: center;
-            }
-
-            .button-group {
-                gap: 12px;
-            }
-
-            .scale-group {
-                gap: 8px;
-            }
-
-            .progress-journey {
-                right: 12px;
-                gap: 8px;
-            }
-
-            .journey-dot {
-                width: 8px;
-                height: 8px;
-            }
-
-            .completion-title,
-            .success-title {
-                font-size: 32px;
-            }
-
-            .completion-subtitle,
-            .success-subtitle {
-                font-size: 16px;
-            }
-        }
-        
-        /* Landscape mobile */
-        @media (max-height: 600px) and (orientation: landscape) {
-            .container {
-                min-height: auto;
-                padding: 24px 32px;
-            }
-
-            .question-container {
-                min-height: 150px;
-            }
-
-            .question-text {
-                margin-bottom: 14px;
-                font-size: 19px;
-                min-height: 54px;
-            }
-
-            .back-button {
-                transform: translate(-50%, calc(-50% + 190px));
-            }
-
-            .back-button:hover {
-                transform: translate(-50%, calc(-50% + 190px)) scale(1.08);
-            }
-
-            .back-button:active {
-                transform: translate(-50%, calc(-50% + 190px)) scale(0.96);
-            }
+            background: #000;
+            width: 0%;
         }
     </style>
 </head>
 <body>
-    <!-- Custom Cursor -->
-    <div class="custom-cursor" id="customCursor"></div>
-
-    <!-- Morphing Blobs -->
-    <div class="blob-1" id="blob1"></div>
-    <div class="blob-2" id="blob2"></div>
-
-    <!-- Side Gauge -->
-    <div class="side-gauge">
-        <div class="side-gauge-glow" id="sideGaugeGlow"></div>
-        <div class="side-gauge-fill" id="sideGaugeFill"></div>
-    </div>
-
-    <!-- Dynamic Progress Orb -->
-    <div class="progress-orb" id="progressOrb"></div>
-
-    <!-- Progress Journey Dots -->
-    <div class="progress-journey" id="progressJourney"></div>
-
-    <!-- Particle Container -->
-    <div id="particleContainer"></div>
-
     <div class="container">
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
-        </div>
-        <div class="progress-border-glow" id="progressBorderGlow"></div>
-        <div class="progress-border" id="progressBorder"></div>
-
-        <!-- Circular Progress Indicator -->
-        <div class="circular-progress">
-            <svg width="56" height="56" viewBox="0 0 56 56">
-                <defs>
-                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#8a2be2;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#c77dff;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-                <circle class="circle-bg" cx="28" cy="28" r="24"></circle>
-                <circle class="circle-progress" cx="28" cy="28" r="24"
-                        stroke-dasharray="150.8"
-                        stroke-dashoffset="150.8"
-                        id="circleProgress"></circle>
-            </svg>
-            <div class="circular-progress-text" id="circularProgressText">0%</div>
         </div>
 
         <div class="header">
@@ -1321,14 +201,6 @@
         </div>
 
         <div class="question-container" id="questionContainer">
-            <!-- Current question will be rendered here dynamically -->
-        </div>
-
-        <!-- Keyboard Shortcuts Hint -->
-        <div class="keyboard-hint" id="keyboardHint">
-            <span><kbd>←</kbd> Back</span>
-            <span><kbd>Y</kbd>/<kbd>N</kbd> Answer</span>
-            <span><kbd>1</kbd>-<kbd>5</kbd> Scale</span>
         </div>
     </div>
 
@@ -1343,295 +215,18 @@
         let questions = [];
         let cachedLocation = null;
 
-        // Replace with your actual Google Apps Script URL
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMNEMDZH1tZSRR_OnOTuEx0Dd7L7pwMXfx62qGqJF7hd614slaSua4u1n9v0BgQx_7gA/exec';
 
         const questionContainer = document.getElementById('questionContainer');
         const progressFill = document.getElementById('progressFill');
-        const progressBorder = document.getElementById('progressBorder');
-        const progressBorderGlow = document.getElementById('progressBorderGlow');
         const questionCounter = document.getElementById('questionCounter');
         const backButton = document.getElementById('backButton');
-        const circleProgress = document.getElementById('circleProgress');
-        const circularProgressText = document.getElementById('circularProgressText');
-        const keyboardHint = document.getElementById('keyboardHint');
-        const progressOrb = document.getElementById('progressOrb');
-        const progressJourney = document.getElementById('progressJourney');
-        const customCursor = document.getElementById('customCursor');
-        const particleContainer = document.getElementById('particleContainer');
 
-        // Touch/Swipe gesture support
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let touchEndX = 0;
-        let touchEndY = 0;
-
-        // Custom cursor movement
-        let mouseX = 0;
-        let mouseY = 0;
-
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            customCursor.style.left = mouseX + 'px';
-            customCursor.style.top = mouseY + 'px';
-        });
-
-        document.addEventListener('mousedown', () => {
-            customCursor.classList.add('clicking');
-        });
-
-        document.addEventListener('mouseup', () => {
-            customCursor.classList.remove('clicking');
-        });
-
-        // Show default cursor on mobile
-        if ('ontouchstart' in window) {
-            document.body.style.cursor = 'auto';
-            customCursor.style.display = 'none';
-        }
-
-        // Create floating particles
-        let currentParticleCount = 0;
-        const baseParticleCount = 15;
-        const maxParticleCount = 100;
-
-        function createParticle() {
-            const particle = document.createElement('div');
-            particle.classList.add('particle');
-
-            // Random depth layer (0-1, affects size, opacity, blur, speed)
-            const depth = Math.random();
-            particle.dataset.depth = depth;
-
-            // Position
-            particle.style.left = Math.random() * 100 + '%';
-
-            // Depth affects speed (deeper = slower, closer = faster)
-            const duration = 12 + (1 - depth) * 20; // 12-32s
-            particle.style.animation = `particle ${duration}s linear infinite`;
-            particle.style.animationDelay = Math.random() * 8 + 's';
-
-            // Depth affects opacity (deeper = more faded)
-            const baseOpacity = 0.15 + depth * 0.25; // 0.15-0.4
-            particle.style.opacity = baseOpacity;
-
-            // Depth affects blur (deeper = more blur)
-            const blur = (1 - depth) * 3; // 0-3px blur for distant ones
-            particle.style.filter = `blur(${blur}px)`;
-
-            // Depth affects z-index - most behind form (z-index 2), few in front
-            // Only top 15% of depth values go in front of form
-            const zIndex = depth > 0.85 ? 3 + Math.floor((depth - 0.85) * 40) : Math.floor(depth * 2);
-            particle.style.zIndex = zIndex;
-
-            // Random size multiplier for variety
-            particle.dataset.sizeMultiplier = 0.4 + Math.random() * 1.2; // 0.4x to 1.6x
-
-            particleContainer.appendChild(particle);
-            currentParticleCount++;
-        }
-
-        function updateParticles(progress) {
-            // Calculate target particle count based on progress (8 to 40)
-            const targetCount = Math.floor(baseParticleCount + (progress / 100) * (maxParticleCount - baseParticleCount));
-
-            // Add particles if needed
-            while (currentParticleCount < targetCount) {
-                createParticle();
-            }
-
-            // Update particle size based on progress (6px to 90px base, varied by multiplier)
-            const baseSize = 6 + (progress / 100) * 84;
-            const particles = particleContainer.querySelectorAll('.particle');
-            particles.forEach(p => {
-                const multiplier = parseFloat(p.dataset.sizeMultiplier) || 1;
-                const size = baseSize * multiplier;
-                p.style.setProperty('--particle-size', `${size}px`);
-            });
-        }
-
-        // Initialize base particles
-        if (window.innerWidth > 768) {
-            for (let i = 0; i < baseParticleCount; i++) {
-                setTimeout(() => createParticle(), i * 200);
-            }
-        }
-
-        // Create journey dots
-        function createJourneyDots() {
-            progressJourney.innerHTML = '';
-            for (let i = 0; i < totalQuestions; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'journey-dot';
-                dot.dataset.index = i;
-                progressJourney.appendChild(dot);
-            }
-            updateJourneyDots();
-        }
-
-        // Update journey dots
-        function updateJourneyDots() {
-            const dots = progressJourney.querySelectorAll('.journey-dot');
-            dots.forEach((dot, index) => {
-                dot.classList.remove('active', 'completed');
-                if (index < currentQuestion) {
-                    dot.classList.add('completed');
-                } else if (index === currentQuestion) {
-                    dot.classList.add('active');
-                }
-            });
-        }
-
-        // Update progress orb position based on progress
-        function updateProgressOrb() {
-            const progress = currentQuestion / totalQuestions;
-            const leftPos = 10 + (progress * 60); // Move from 10% to 70%
-            const bottomPos = 10 + (progress * 40); // Move from 10% to 50%
-            progressOrb.style.left = `${leftPos}%`;
-            progressOrb.style.bottom = `${bottomPos}%`;
-            progressOrb.style.opacity = 0.8 + (progress * 0.2); // Fade in more as progress increases
-        }
-
-        // Update circular progress indicator
-        function updateCircularProgress() {
-            const progress = (currentQuestion / totalQuestions) * 100;
-            const circumference = 2 * Math.PI * 24; // 24 is the radius
-            const offset = circumference - (progress / 100) * circumference;
-            circleProgress.style.strokeDashoffset = offset;
-            circularProgressText.textContent = `${Math.round(progress)}%`;
-        }
-
-        // Ripple effect disabled
-        function createRipple(event) {
-            // Disabled
-        }
-
-        // Create confetti animation
-        function createConfetti() {
-            const colors = ['#00ffff', '#00e5ff', '#00d4ff', '#00ff88', '#64ffff'];
-            const confettiCount = 50;
-
-            for (let i = 0; i < confettiCount; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.classList.add('confetti');
-                    confetti.style.left = Math.random() * 100 + '%';
-                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                    confetti.style.animationDelay = (Math.random() * 0.5) + 's';
-
-                    document.body.appendChild(confetti);
-
-                    setTimeout(() => confetti.remove(), 3500);
-                }, i * 30);
-            }
-        }
-
-        // Celebrate answer selection
-        function celebrateAnswer(button) {
-            button.classList.add('celebrating');
-            setTimeout(() => button.classList.remove('celebrating'), 500);
-        }
-
-        // Show keyboard hints on desktop
-        function showKeyboardHints() {
-            if (window.innerWidth > 768 && !('ontouchstart' in window)) {
-                setTimeout(() => {
-                    keyboardHint.classList.add('visible');
-                }, 500);
-
-                // Hide after 3 seconds
-                setTimeout(() => {
-                    keyboardHint.classList.remove('visible');
-                }, 3500);
-            }
-        }
-
-        // Keyboard shortcut handler
-        function handleKeyboardShortcut(event) {
-            const key = event.key.toLowerCase();
-            const question = questions[currentQuestion];
-
-            // Ignore if we're at completion screen
-            if (currentQuestion >= questions.length) return;
-
-            // Back arrow
-            if (key === 'arrowleft') {
-                event.preventDefault();
-                goBack();
-                return;
-            }
-
-            // Yes/No shortcuts
-            if (question && question.type === 'yesno') {
-                if (key === 'y') {
-                    event.preventDefault();
-                    const yesBtn = questionContainer.querySelector('[data-value="Yes"]');
-                    if (yesBtn) yesBtn.click();
-                } else if (key === 'n') {
-                    event.preventDefault();
-                    const noBtn = questionContainer.querySelector('[data-value="No"]');
-                    if (noBtn) noBtn.click();
-                }
-            }
-
-            // Number shortcuts for scale questions
-            if (question && question.type === 'scale') {
-                const num = parseInt(key);
-                if (num >= 1 && num <= 5) {
-                    event.preventDefault();
-                    const scaleBtn = questionContainer.querySelector(`[data-value="${num}"]`);
-                    if (scaleBtn) scaleBtn.click();
-                }
-            }
-        }
-
-        // Swipe gesture handlers
-        function handleTouchStart(event) {
-            touchStartX = event.changedTouches[0].screenX;
-            touchStartY = event.changedTouches[0].screenY;
-        }
-
-        function handleTouchMove(event) {
-            touchEndX = event.changedTouches[0].screenX;
-            touchEndY = event.changedTouches[0].screenY;
-
-            const deltaX = touchEndX - touchStartX;
-            const deltaY = Math.abs(touchEndY - touchStartY);
-
-            // Only show swipe effect if horizontal swipe is dominant
-            if (Math.abs(deltaX) > 30 && deltaY < 50) {
-                if (deltaX > 0 && currentQuestion > 0) {
-                    questionContainer.classList.add('swipe-right');
-                    questionContainer.classList.remove('swipe-left');
-                } else if (deltaX < 0) {
-                    questionContainer.classList.add('swipe-left');
-                    questionContainer.classList.remove('swipe-right');
-                }
-            }
-        }
-
-        function handleTouchEnd() {
-            const deltaX = touchEndX - touchStartX;
-            const deltaY = Math.abs(touchEndY - touchStartY);
-
-            // Remove swipe classes
-            questionContainer.classList.remove('swipe-left', 'swipe-right');
-
-            // Swipe right to go back
-            if (deltaX > 100 && deltaY < 50 && currentQuestion > 0) {
-                goBack();
-            }
-        }
-
-        // Load questions from config file
         async function loadQuestions() {
             try {
                 const response = await fetch('questions.json');
                 const config = await response.json();
                 questions = config.questions.map(q => {
-                    // Convert minLabel/maxLabel to labels array for compatibility
                     if (q.type === 'scale') {
                         return {
                             ...q,
@@ -1642,110 +237,62 @@
                 });
                 totalQuestions = questions.length;
 
-                // Initialize the app after questions are loaded
-                createJourneyDots();
                 renderQuestion(currentQuestion);
                 updateProgress();
 
-                // Pre-fetch location in background so it's ready at submission
                 getUserLocation().then(loc => { cachedLocation = loc; });
             } catch (error) {
                 console.error('Failed to load questions:', error);
                 questionContainer.innerHTML = `
-                    <div style="text-align: center; color: #e74c3c;">
+                    <div style="text-align: center; color: #666;">
                         <p>Failed to load questions.</p>
                         <p style="font-size: 14px; margin-top: 8px;">Please refresh the page.</p>
                     </div>
                 `;
             }
         }
-        
+
         function updateProgress() {
             const progress = (currentQuestion / totalQuestions) * 100;
             progressFill.style.width = `${progress}%`;
-
-            // Shadow depth: grows deeper with progress (more dramatic)
-            const container = document.querySelector('.container');
-            const shadowDepth = 20 + (progress / 100) * 80; // 20px to 100px
-            const shadowBlur = 60 + (progress / 100) * 100; // 60px to 160px
-            const shadowSpread = (progress / 100) * 20; // 0px to 20px
-            container.style.setProperty('--shadow-depth', `${shadowDepth}px`);
-            container.style.setProperty('--shadow-blur', `${shadowBlur}px`);
-            container.style.setProperty('--shadow-spread', `${shadowSpread}px`);
-
-            // Blobs react: opacity increases with progress
-            const blob1 = document.getElementById('blob1');
-            const blob2 = document.getElementById('blob2');
-            const blobOpacity = 0.3 + (progress / 100) * 0.7; // 0.3 to 1.0
-            blob1.style.setProperty('--blob-opacity', blobOpacity);
-            blob2.style.setProperty('--blob-opacity', blobOpacity * 0.85);
-
-            // Side gauge fill
-            const sideGaugeFill = document.getElementById('sideGaugeFill');
-            const sideGaugeGlow = document.getElementById('sideGaugeGlow');
-            sideGaugeFill.style.height = `${progress}%`;
-            sideGaugeGlow.style.height = `${progress}%`;
-
-            // Particles grow bigger and more numerous
-            if (window.innerWidth > 768) {
-                updateParticles(progress);
-            }
-
             questionCounter.textContent = `Question ${currentQuestion + 1} of ${totalQuestions}`;
-            updateCircularProgress();
-            updateJourneyDots();
-            updateProgressOrb();
             updateBackButton();
         }
 
         function updateBackButton() {
-            const container = document.querySelector('.container');
             if (currentQuestion > 0) {
                 backButton.classList.add('visible');
-                container.classList.add('show-back-button');
             } else {
                 backButton.classList.remove('visible');
-                container.classList.remove('show-back-button');
             }
         }
 
         function goBack() {
             if (currentQuestion > 0) {
-                // Exit current question
-                const currentQuestionEl = questionContainer.querySelector('.question');
-                if (currentQuestionEl) {
-                    currentQuestionEl.classList.remove('active');
-                    currentQuestionEl.classList.add('exiting');
+                currentQuestion--;
+                renderQuestion(currentQuestion);
+                updateProgress();
+
+                const question = questions[currentQuestion];
+                const previousAnswer = formData[question.field];
+
+                if (previousAnswer) {
+                    setTimeout(() => {
+                        const buttons = questionContainer.querySelectorAll('.btn, .scale-btn');
+                        buttons.forEach(btn => {
+                            if (btn.getAttribute('data-value') === previousAnswer) {
+                                btn.classList.add('selected');
+                            }
+                        });
+                    }, 50);
                 }
-
-                setTimeout(() => {
-                    currentQuestion--;
-                    renderQuestion(currentQuestion);
-                    updateProgress();
-
-                    // Restore previous answer if it exists
-                    const question = questions[currentQuestion];
-                    const previousAnswer = formData[question.field];
-
-                    if (previousAnswer) {
-                        // Find and highlight the previously selected button
-                        setTimeout(() => {
-                            const buttons = questionContainer.querySelectorAll('.btn, .scale-btn');
-                            buttons.forEach(btn => {
-                                if (btn.getAttribute('data-value') === previousAnswer) {
-                                    btn.classList.add('selected');
-                                }
-                            });
-                        }, 50);
-                    }
-                }, 300);
             }
         }
-        
+
         function renderQuestion(questionIndex) {
             const question = questions[questionIndex];
             let buttonsHTML = '';
-            
+
             if (question.type === 'yesno') {
                 buttonsHTML = `
                     <div class="button-group">
@@ -1768,159 +315,67 @@
                     </div>
                 `;
             }
-            
-            // Clear container completely before adding new content
-            questionContainer.innerHTML = '';
-            
-            // Force a reflow to ensure clean state
-            questionContainer.offsetHeight;
-            
+
             questionContainer.innerHTML = `
-                <div class="question entering">
+                <div class="question">
                     <div class="question-text">${question.text}</div>
                     ${buttonsHTML}
                 </div>
             `;
-            
-            // Trigger animation and ensure completely clean button state
-            setTimeout(() => {
-                const questionEl = questionContainer.querySelector('.question');
-                if (questionEl) {
-                    questionEl.classList.remove('entering');
-                    questionEl.classList.add('active');
-                    
-                    // Triple-check button state cleanup
-                    const allButtons = questionContainer.querySelectorAll('.btn, .scale-btn');
-                    allButtons.forEach(btn => {
-                        btn.classList.remove('selected');
-                        btn.blur();
-                        btn.removeAttribute('style');
-                        // Force reset any CSS properties that might be stuck
-                        btn.style.background = '';
-                        btn.style.color = '';
-                        btn.style.borderColor = '';
-                        btn.style.transform = '';
-                    });
-                }
-            }, 50); // Increased delay slightly
         }
-        
+
         function renderCompletionScreen() {
             questionContainer.innerHTML = `
-                <div class="completion-screen entering">
+                <div class="completion-screen">
                     <div class="completion-icon">📝</div>
                     <div class="completion-title">All done!</div>
                     <div class="completion-subtitle">Submitting your check-in...</div>
                 </div>
             `;
 
-            // Trigger confetti celebration
-            createConfetti();
-
-            setTimeout(() => {
-                const screen = questionContainer.querySelector('.completion-screen');
-                screen.classList.remove('entering');
-                screen.classList.add('active');
-
-                // Auto-submit after showing completion screen
-                setTimeout(() => {
-                    handleSubmit();
-                }, 300);
-            }, 10);
-
             questionCounter.textContent = 'Complete!';
             progressFill.style.width = '100%';
 
-            // Max out all progress effects
-            const container = document.querySelector('.container');
-            container.style.setProperty('--shadow-depth', '100px');
-            container.style.setProperty('--shadow-blur', '160px');
-            container.style.setProperty('--shadow-spread', '20px');
-
-            const blob1 = document.getElementById('blob1');
-            const blob2 = document.getElementById('blob2');
-            blob1.style.setProperty('--blob-opacity', '1');
-            blob2.style.setProperty('--blob-opacity', '0.85');
-
-            document.getElementById('sideGaugeFill').style.height = '100%';
-            document.getElementById('sideGaugeGlow').style.height = '100%';
-
-            // Max out particles
-            if (window.innerWidth > 768) {
-                updateParticles(100);
-            }
-
-            updateCircularProgress();
+            setTimeout(() => {
+                handleSubmit();
+            }, 300);
         }
-        
+
         function renderSuccessScreen() {
             questionContainer.innerHTML = `
-                <div class="success-screen entering">
+                <div class="success-screen">
                     <div class="success-icon">✅</div>
                     <div class="success-title">Check-in Submitted!</div>
                     <div class="success-subtitle">Your responses have been saved successfully.<br>See you tomorrow!</div>
                 </div>
             `;
-            
-            setTimeout(() => {
-                const screen = questionContainer.querySelector('.success-screen');
-                screen.classList.remove('entering');
-                screen.classList.add('active');
-            }, 10);
         }
-        
+
         function showNextQuestion() {
             if (currentQuestion < questions.length) {
-                // Exit current question
-                const currentQuestionEl = questionContainer.querySelector('.question, .completion-screen');
-                if (currentQuestionEl) {
-                    currentQuestionEl.classList.remove('active');
-                    currentQuestionEl.classList.add('exiting');
-                    
-                    // Aggressively clear all button states before transition
-                    const allButtons = currentQuestionEl.querySelectorAll('.btn, .scale-btn');
-                    allButtons.forEach(btn => {
-                        btn.classList.remove('selected');
-                        btn.blur();
-                        btn.style.removeProperty('background');
-                        btn.style.removeProperty('color');
-                        btn.style.removeProperty('border-color');
-                    });
+                if (currentQuestion < questions.length - 1) {
+                    currentQuestion++;
+                    renderQuestion(currentQuestion);
+                    updateProgress();
+                } else {
+                    renderCompletionScreen();
                 }
-                
-                setTimeout(() => {
-                    if (currentQuestion < questions.length - 1) {
-                        currentQuestion++;
-                        renderQuestion(currentQuestion);
-                        updateProgress();
-                    } else {
-                        // Last question answered - show completion and auto-submit
-                        renderCompletionScreen();
-                    }
-                }, 160);
             }
         }
-        
+
         function handleAnswer(field, value) {
-            // Store the answer
             formData[field] = value;
 
-            // Visual feedback - highlight the selected button
             const buttons = questionContainer.querySelectorAll('.btn, .scale-btn');
             buttons.forEach(btn => btn.classList.remove('selected'));
             event.target.classList.add('selected');
 
-            // Add celebration animation
-            celebrateAnswer(event.target);
-
-            // Advance to next question after short delay
             setTimeout(() => {
-                // Clear the selection styling before moving to next question
                 buttons.forEach(btn => btn.classList.remove('selected'));
                 showNextQuestion();
-            }, 120);
+            }, 200);
         }
-        
+
         async function getUserLocation() {
             return new Promise((resolve) => {
                 if ('geolocation' in navigator) {
@@ -1937,7 +392,7 @@
                         {
                             enableHighAccuracy: false,
                             timeout: 5000,
-                            maximumAge: 300000 // 5 minutes
+                            maximumAge: 300000
                         }
                     );
                 } else {
@@ -1945,28 +400,24 @@
                 }
             });
         }
-        
+
         async function handleSubmit() {
-            // Update the completion screen to show submitting status
             const completionScreen = questionContainer.querySelector('.completion-screen');
             if (completionScreen) {
                 const subtitle = completionScreen.querySelector('.completion-subtitle');
                 const icon = completionScreen.querySelector('.completion-icon');
-                
+
                 subtitle.textContent = 'Submitting...';
                 icon.textContent = '⏳';
             }
-            
+
             try {
-                // Get current UTC date and time
                 const now = new Date();
-                const utcDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
-                const utcTime = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS
-                
-                // Use pre-fetched location if available, otherwise fetch now
+                const utcDate = now.toISOString().split('T')[0];
+                const utcTime = now.toISOString().split('T')[1].split('.')[0];
+
                 const location = cachedLocation || await getUserLocation();
-                
-                // Create comma-separated string with date/time first, then responses, then location
+
                 const responses = [
                     utcDate,
                     utcTime,
@@ -1992,108 +443,48 @@
                     formData.scale8,
                     location
                 ];
-                
+
                 const dataString = responses.join(',');
-                
-                // Create form data for POST request
+
                 const formDataToSend = new FormData();
                 formDataToSend.append('data', dataString);
-                
+
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     body: formDataToSend
                 });
-                
+
                 const result = await response.text();
-                
-                // Assume success if we get any response without error
-                // Transition to success screen
-                if (completionScreen) {
-                    completionScreen.classList.remove('active');
-                    completionScreen.classList.add('exiting');
-                }
-                
+
                 setTimeout(() => {
                     renderSuccessScreen();
                 }, 300);
-                
+
             } catch (error) {
-                // Show error state in completion screen
                 if (completionScreen) {
                     const subtitle = completionScreen.querySelector('.completion-subtitle');
                     const icon = completionScreen.querySelector('.completion-icon');
-                    
+
                     subtitle.innerHTML = `Submission failed: ${error.message}<br><small>Please try refreshing the page</small>`;
                     icon.textContent = '❌';
                 }
             }
         }
-        
-        // Back button click handler
+
         backButton.addEventListener('click', function(e) {
             e.preventDefault();
             goBack();
         });
 
-        // Event delegation for button clicks
         questionContainer.addEventListener('click', function(e) {
             if (e.target.classList.contains('btn') || e.target.classList.contains('scale-btn')) {
                 const field = e.target.getAttribute('data-field');
                 const value = e.target.getAttribute('data-value');
-
-                // Force remove hover state on iOS by temporarily disabling pointer events
-                e.target.style.pointerEvents = 'none';
-                setTimeout(() => {
-                    e.target.style.pointerEvents = '';
-                }, 300);
-
                 handleAnswer(field, value);
             }
         });
-        
-        // Additional iOS hover fix - remove hover states on any touch
-        document.addEventListener('touchstart', function() {
-            // Add a class to body to disable hover effects during touch
-            document.body.classList.add('touching');
-        });
 
-        document.addEventListener('touchend', function() {
-            // Remove the touching class after a delay to prevent phantom hovers
-            setTimeout(() => {
-                document.body.classList.remove('touching');
-            }, 500);
-        });
-
-        // Add ripple effect to buttons
-        questionContainer.addEventListener('mousedown', function(e) {
-            if (e.target.classList.contains('btn') || e.target.classList.contains('scale-btn')) {
-                createRipple(e);
-            }
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', handleKeyboardShortcut);
-
-        // Swipe gesture support
-        questionContainer.addEventListener('touchstart', handleTouchStart, { passive: true });
-        questionContainer.addEventListener('touchmove', handleTouchMove, { passive: true });
-        questionContainer.addEventListener('touchend', handleTouchEnd, { passive: true });
-
-        // Initialize - load questions then render first question
-        loadQuestions().then(() => {
-            // Show keyboard hints on first load for desktop users
-            showKeyboardHints();
-        });
-
-        // Prevent zoom on double-tap for iOS
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function (event) {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
+        loadQuestions();
     </script>
 </body>
 </html>
